@@ -1,4 +1,5 @@
 const chalk = require("chalk");
+const Table = require('cli-table');
 const config = require.main.require('./config.js');
 const server = require.main.require('./bundles/server.js');
 const world = server.bundles.world;
@@ -27,9 +28,8 @@ module.exports = {
 		server.commands.push(command);
 	},
 	
-	runCommand : function (arguments, character, socket) {		
-		let output;
-// Command can only be used by player-controlled characters (not NPC:s)
+	runCommand : function (arguments, character, socket) {
+		// Command can only be used by player-controlled characters (not NPC:s)
 		if (!socket) { return; }
 		
 		// Make arguments case-insensitive
@@ -43,12 +43,11 @@ module.exports = {
 				"name": "Radio",
 				"type": "Circuitry",
 				"description": "Allows for remote control and communication.",
-				"status": "Fully functional",
+				"status": "Operational",
 				"active": true,
 				"error": false,
 				"level": 1,
 				"max": 1,
-				"min": 0,
 				"current": 1,
 				"valueTerm": "",
 				"warningBelow": 0,
@@ -62,12 +61,11 @@ module.exports = {
 				"name": "Memory",
 				"type": "Circuitry",
 				"description": "Onboard computer memory. Capacity limits operations.",
-				"status": "Functional but reduced capacity",
+				"status": "Reduced capacity!",
 				"active": true,
 				"error": false,
 				"level": 1,
 				"max": 1048576, //2^20
-				"min": 0,
 				"current": 128,
 				"valueTerm": "Bytes",
 				"warningBelow": 1024,
@@ -80,13 +78,12 @@ module.exports = {
 			{
 				"name": "Legs",
 				"type": "Actuator",
-				"description": "Claw-like legs. Faciliate latching and movement.",
-				"status": "Latched to surface but motor stuck",
+				"description": "Claw-like legs. Facilitate latching and movement.",
+				"status": "Latched to surface but motor stuck!",
 				"active": false,
 				"error": true,
 				"level": 1,
 				"max": 1,
-				"min": 0,
 				"current": 0,
 				"valueTerm": "",
 				"warningBelow": 0,
@@ -99,13 +96,12 @@ module.exports = {
 			{
 				"name": "Arms",
 				"type": "Actuator",
-				"description": "Clamps on arms. May manipulate close-by objects and materials.",
-				"status": "Idle",
+				"description": "Clamps on arms. May manipulate close-by\nobjects and materials.",
+				"status": "Operational",
 				"active": false,
 				"error": false,
 				"level": 1,
 				"max": 1,
-				"min": 0,
 				"current": 0,
 				"valueTerm": "",
 				"warningBelow": 0,
@@ -118,13 +114,12 @@ module.exports = {
 			{
 				"name": "Silicon extractor",
 				"type": "Module",
-				"description": "Materials processing for silicon, extracting from rocks and debris.",
-				"status": "Idle",
+				"description": "Materials processing for silicon, extracting\nfrom rocks and debris.",
+				"status": "Operational",
 				"active": false,
 				"error": false,
 				"level": 1,
 				"max": 1,
-				"min": 0,
 				"current": 0,
 				"valueTerm": "",
 				"warningBelow": 0,
@@ -137,13 +132,12 @@ module.exports = {
 			{
 				"name": "Metals extractor",
 				"type": "Module",
-				"description": "Materials processing for metals, extracting from rocks and debris.",
-				"status": "Idle",
+				"description": "Materials processing for metals, extracting\nfrom rocks and debris.",
+				"status": "Operational",
 				"active": false,
 				"error": false,
 				"level": 1,
 				"max": 1,
-				"min": 0,
 				"current": 0,
 				"valueTerm": "",
 				"warningBelow": 0,
@@ -157,12 +151,11 @@ module.exports = {
 				"name": "Materials storage",
 				"type": "Module",
 				"description": "General purpose storage for materials.",
-				"status": "Working",
+				"status": "Operational",
 				"active": true,
 				"error": false,
 				"level": 1,
 				"max": 40,
-				"min": 0,
 				"current": 0,
 				"valueTerm": "Capacity",
 				"warningBelow": 0,
@@ -176,12 +169,11 @@ module.exports = {
 				"name": "Module factory",
 				"type": "Module",
 				"description": "A module which can build other modules.",
-				"status": "Idle",
+				"status": "Operational",
 				"active": false,
 				"error": false,
 				"level": 1,
 				"max": 1,
-				"min": 0,
 				"current": 0,
 				"valueTerm": "",
 				"warningBelow": 0,
@@ -195,12 +187,11 @@ module.exports = {
 				"name": "Solar panel",
 				"type": "Energy",
 				"description": "Energy harvesting from light energy.",
-				"status": "Functional but panel damage",
+				"status": "Panel damage!",
 				"active": true,
 				"error": false,
 				"level": 1,
 				"max": 100,
-				"min": 0,
 				"current": 5,
 				"valueTerm": "Energy input",
 				"warningBelow": 20,
@@ -213,13 +204,12 @@ module.exports = {
 			{
 				"name": "Battery",
 				"type": "Energy",
-				"description": "Energy storage for bot computer, sensors and actuators.",
-				"status": "Low capacity, needs repair",
+				"description": "Energy storage for bot computer, sensors\nand actuators.",
+				"status": "Low capacity!",
 				"active": true,
 				"error": false,
 				"level": 1,
 				"max": 20,
-				"min": 0,
 				"current": 20,
 				"valueTerm": "Stored",
 				"warningBelow": 50,
@@ -233,12 +223,11 @@ module.exports = {
 				"name": "Fuel",
 				"type": "Energy",
 				"description": "Fuel storage for engines.",
-				"status": "Empty",
+				"status": "Operational",
 				"active": false,
 				"error": false,
 				"level": 1,
 				"max": 100,
-				"min": 0,
 				"current": 0,
 				"valueTerm": "Stored",
 				"warningBelow": 40,
@@ -252,12 +241,11 @@ module.exports = {
 				"name": "Ion Engine",
 				"type": "Engine",
 				"description": "Propulsion engine for slow, long journeys.",
-				"status": "Unknown damage",
+				"status": "Unknown damage!",
 				"active": false,
 				"error": true,
 				"level": 1,
 				"max": 1,
-				"min": 0,
 				"current": 0,
 				"valueTerm": "Thrust",
 				"warningBelow": 0,
@@ -269,13 +257,22 @@ module.exports = {
 			},
 		];
 
-		socket.emit('output', { msg: "Bot status:" });
-
 		// "Status". No arguments (i.e. "status" or "status bot"), so status of bot
 		if (arguments === "" || arguments === "bot") {
-			let output = chalk.white("Energy\tYields\tDetails\n");
+			let output = "Modules status:\n\n";
 			let netEnergy = 0;
 			let availableEnergy = 0;
+
+			let table = new Table({
+				head: [
+					chalk.whiteBright.bold("NAME"),
+					chalk.whiteBright.bold("NRG COST"),
+					chalk.whiteBright.bold("YIELDS"),
+					chalk.whiteBright.bold("DETAILS")
+				],
+				colWidths: [20, 10, 10, 20],
+			});
+
 			statuses.forEach(status => {
 				let col = colors.cyan;
 				if (status.error) {
@@ -286,17 +283,27 @@ module.exports = {
 					col = colors.green
 				}
 				const colText = chalk.hex(col)
-				output += (status.active && !status.error && status.energy !== 0 ? chalk.white(status.energy) : "  ")
-					+ "\t"
-					+ (status.active && !status.error && status.yeildType !== ""
-						? chalk.white(status.yield + " " + status.yeildType)
-						: "    "
-					) + "\t"
-					+ (status.active ? chalk.greenBright('[ACTIVE]   ') : chalk.gray('[INACTIVE] '))
-					+ colText.bold(status.name)
-					+ ''
-					+ (status.error ? chalk.redBright(' [ERR]') : '')
-					+ '\n';
+				let energyUsage = chalk.gray(status.energy)
+				if (status.active && !status.error && status.energy > 0) {
+					energyUsage = chalk.yellowBright(status.energy)
+				} else if (status.active && !status.error && status.energy < 0) {
+					energyUsage = chalk.greenBright(status.energy)
+				} else if (status.energy === 0) {
+					energyUsage = ""
+				}
+				table.push(
+					[
+						colText(status.name),
+						energyUsage,
+						(status.active && !status.error && status.yeildType !== ""
+								? chalk.greenBright(status.yield + " " + status.yeildType)
+								: ""
+						),
+						(status.active ? chalk.greenBright('[ACTIVE] ') : chalk.gray('[INACTIVE] '))
+							+ (status.error ? chalk.redBright(' [ERR]') : '')
+					]
+				)
+
 				availableEnergy += status.active && !status.error ? status.energy * -1 : 0
 				if (status.active && !status.error && status.yeildType === "NRG") {
 					netEnergy += status.yield
@@ -304,6 +311,15 @@ module.exports = {
 					netEnergy -= status.energy
 				}
 			})
+
+			output += table.toString() + "\n"
+
+			output += "\nEnergy (NRG) status:\n\n"
+
+			table = new Table({
+				colWidths: [20, 10],
+			});
+
 			let col = colors.green
 			if (availableEnergy < 5) {
 				col = colors.orange
@@ -311,7 +327,9 @@ module.exports = {
 				col = colors.red
 			}
 			let colText = chalk.hex(col);
-			output += 'Available energy: ' + colText(availableEnergy) + "\n"
+			table.push(
+				['Available energy', colText(availableEnergy)]
+			)
 
 			col = colors.green
 			if (netEnergy < 5) {
@@ -320,11 +338,16 @@ module.exports = {
 				col = colors.red
 			}
 			colText = chalk.hex(col)
-			output += 'Net energy: ' + colText(netEnergy) + ' - '
+			table.push(
+				['Net energy', colText(netEnergy)]
+			)
+
+			output += table.toString() + "\n"
+
 			if (netEnergy >= 0) {
-				output += chalk.green('positive net energy: battery will not deplete')
+				output += chalk.green('Positive net energy: battery will not deplete')
 			} else {
-				output += chalk.hex(colors.orange)(' - NEGATIVE net energy: battery WILL deplete')
+				output += chalk.hex(colors.orange)('NEGATIVE net energy: battery WILL deplete')
 			}
 			
 			socket.emit('output', { msg: output });
@@ -343,34 +366,55 @@ module.exports = {
 			}
 			const colText = chalk.hex(col)
 
+			const warning = status.current < status.warningBelow || status.current > status.warningAbove
+			let warningText = ""
+			if (warning) {
+				warningText = "YES - " + status.valueTerm.toLowerCase() + " is too "
+					+ (status.current < status.warningBelow ? "LOW" : "HIGH")
+			}
+
 			if (status) {
-				output += chalk.white('Name: \t\t') + chalk.bold(status.name) + '\n';
-				output += chalk.white('Type: \t\t') + status.type + '\n';
-				output += chalk.white('Description: \t') + status.description + '\n';
-				output += chalk.white('Status: \t') + colText(status.status) + '\n';
-				output += chalk.white('Is Active?: \t') + (status.active ? chalk.greenBright('YES') : 'NO') + '\n';
-				output += chalk.white('Has Error?: \t') + (status.error ? chalk.redBright('YES') : 'NO') + '\n';
+				const table = new Table({
+					colWidths: [16, 50]
+				});
+				table.push(
+					[chalk.white('Name'), chalk.bold(status.name)],
+					[chalk.white('Type'), status.type],
+					[chalk.white('Description'), status.description],
+					[chalk.white('Status'), colText(status.status)],
+					[chalk.white('Is Active?'), (status.active ? chalk.greenBright('YES') : chalk.gray('NO'))],
+					[chalk.white('Has Error?'), (status.error ? chalk.redBright('YES') : chalk.gray('NO'))],
+					[chalk.white('Has warning?'), (warning ? chalk.hex(colors.orange)(warningText) : chalk.gray('NO'))]
+				)
+
 				if (status.valueTerm !== "") {
-					output += chalk.white(status.valueTerm + ': \t')
-						+ (status.current < status.warningBelow || status.current > status.warningAbove
-							? chalk.yellow(status.current)
-							: chalk.greenBright(status.current)
-						) + (status.min !== 0 ? ' / ' + status.max : ' of ' + status.min + ' to ' + status.max)
-						+ '\n';
+					table.push(
+						[
+							chalk.white(status.valueTerm),
+							(status.current < status.warningBelow || status.current > status.warningAbove
+									? chalk.yellow(status.current)
+									: chalk.greenBright(status.current)
+							) + chalk.white(' / ' + status.max)
+						]
+					)
 				}
-				output += chalk.white('Energy usage: \t')
-					+ (status.energy <= 0 ? chalk.green(status.energy) : chalk.yellow(status.energy))
-					+ '\n';
+				table.push(
+					[
+						chalk.white('Energy usage'),
+						(status.energy <= 0 ? chalk.green(status.energy) : chalk.yellowBright(status.energy))
+							+ (!status.active ? chalk.gray(" when active") : "")
+					]
+				)
 				if (status.yield > 0) {
-					output += chalk.white('Yield: \t\t') + chalk.bold(status.yield) + " units per hour" + '\n';
+					table.push([chalk.white('Yield'), chalk.bold(status.yield) + " units per hour"])
 				}
-				output += chalk.white('Actions: \t')
-				if (status.actions.length === 0) {
-					output += chalk.gray("None") + '\n';
-				} else {
-					output += status.actions.join(", ") + '\n';
+				let actions = chalk.gray("None")
+				if (status.actions.length !== 0) {
+					actions = status.actions.join(", ")
 				}
-				output += '\n';
+				table.push([chalk.white('Actions'), actions])
+
+				output += table.toString() + '\n';
 			} else {
 				output += "Status not found for area " + chalk.bgRed(arguments)
 			}

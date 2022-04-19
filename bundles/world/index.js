@@ -53,7 +53,9 @@ module.exports = {
 		
 		socket.emit('output', { msg: "Logged into bot " + chalk.bold(socket.character.name) + ".\n\n" });
 
-		// Run "look" command to look at the room we're standing in
+		socket.emit('output', { msg: "Fetching status..." });
+
+		// Run "status" command by default when connecting
 		this.runCommand("status", socket.character);
 	},
 
