@@ -41,7 +41,7 @@ module.exports = {
 		const statuses = [
 			{
 				"name": "Radio",
-				"type": "Circuitry",
+				"type": "Communications",
 				"description": "Allows for remote control and communication.",
 				"status": "Operational",
 				"active": true,
@@ -55,7 +55,43 @@ module.exports = {
 				"actions": [],
 				"energy": 3,
 				"yield": 0,
-				"yeildType": ""
+				"yieldType": ""
+			},
+			{
+				"name": "Radar",
+				"type": "Sensor",
+				"description": "Sees local area.",
+				"status": "Unknown damage!",
+				"active": false,
+				"error": true,
+				"level": 1,
+				"max": 1,
+				"current": 0,
+				"valueTerm": "",
+				"warningBelow": 0,
+				"warningAbove": 1,
+				"actions": ["scan-local"],
+				"energy": 50,
+				"yield": 0,
+				"yieldType": ""
+			},
+			{
+				"name": "SOS Eye",
+				"type": "Sensor",
+				"description": "Star Orientation System Eye:\nDetermines location in galaxy.",
+				"status": "Unknown damage!",
+				"active": false,
+				"error": true,
+				"level": 1,
+				"max": 1,
+				"current": 0,
+				"valueTerm": "",
+				"warningBelow": 0,
+				"warningAbove": 1,
+				"actions": ["scan-local"],
+				"energy": 10,
+				"yield": 0,
+				"yieldType": ""
 			},
 			{
 				"name": "Memory",
@@ -73,7 +109,7 @@ module.exports = {
 				"actions": [],
 				"energy": 2,
 				"yield": 0,
-				"yeildType": ""
+				"yieldType": ""
 			},
 			{
 				"name": "Legs",
@@ -91,7 +127,7 @@ module.exports = {
 				"actions": ["crawl", "push", "latch"],
 				"energy": 10,
 				"yield": 0,
-				"yeildType": ""
+				"yieldType": ""
 			},
 			{
 				"name": "Arms",
@@ -106,14 +142,14 @@ module.exports = {
 				"valueTerm": "",
 				"warningBelow": 0,
 				"warningAbove": 1,
-				"actions": ["harvest", "repair", "dig", "build"],
+				"actions": ["harvest", "repair", "build"],
 				"energy": 5,
 				"yield": 0,
-				"yeildType": ""
+				"yieldType": ""
 			},
 			{
 				"name": "Silicon extractor",
-				"type": "Module",
+				"type": "Extractor",
 				"description": "Materials processing for silicon, extracting\nfrom rocks and debris.",
 				"status": "Operational",
 				"active": false,
@@ -127,11 +163,11 @@ module.exports = {
 				"actions": [],
 				"energy": 2,
 				"yield": 1,
-				"yeildType": "SIL"
+				"yieldType": "SIL"
 			},
 			{
 				"name": "Metals extractor",
-				"type": "Module",
+				"type": "Extractor",
 				"description": "Materials processing for metals, extracting\nfrom rocks and debris.",
 				"status": "Operational",
 				"active": false,
@@ -145,11 +181,11 @@ module.exports = {
 				"actions": [],
 				"energy": 3,
 				"yield": 2,
-				"yeildType": "MET"
+				"yieldType": "MET"
 			},
 			{
 				"name": "Materials storage",
-				"type": "Module",
+				"type": "Storage",
 				"description": "General purpose storage for materials.",
 				"status": "Operational",
 				"active": true,
@@ -163,11 +199,11 @@ module.exports = {
 				"actions": [],
 				"energy": 0,
 				"yield": 0,
-				"yeildType": ""
+				"yieldType": ""
 			},
 			{
 				"name": "Module factory",
-				"type": "Module",
+				"type": "Factory",
 				"description": "A module which can build other modules.",
 				"status": "Operational",
 				"active": false,
@@ -181,7 +217,7 @@ module.exports = {
 				"actions": ["fabricate"],
 				"energy": 40,
 				"yield": 0.4,
-				"yeildType": "MOD"
+				"yieldType": "MOD"
 			},
 			{
 				"name": "Solar panel",
@@ -199,7 +235,7 @@ module.exports = {
 				"actions": [],
 				"energy": 0,
 				"yield": 6,
-				"yeildType": "NRG"
+				"yieldType": "NRG"
 			},
 			{
 				"name": "Battery",
@@ -217,7 +253,7 @@ module.exports = {
 				"actions": [],
 				"energy": -10,
 				"yield": 0,
-				"yeildType": ""
+				"yieldType": ""
 			},
 			{
 				"name": "Fuel",
@@ -235,7 +271,7 @@ module.exports = {
 				"actions": [],
 				"energy": 0,
 				"yield": 0,
-				"yeildType": ""
+				"yieldType": ""
 			},
 			{
 				"name": "Ion Engine",
@@ -253,7 +289,7 @@ module.exports = {
 				"actions": ["fly"],
 				"energy": 1000,
 				"yield": 0,
-				"yeildType": ""
+				"yieldType": ""
 			},
 		];
 
@@ -295,8 +331,8 @@ module.exports = {
 					[
 						colText(status.name),
 						energyUsage,
-						(status.active && !status.error && status.yeildType !== ""
-								? chalk.greenBright(status.yield + " " + status.yeildType)
+						(status.active && !status.error && status.yieldType !== ""
+								? chalk.greenBright(status.yield + " " + status.yieldType)
 								: ""
 						),
 						(status.active ? chalk.greenBright('[ACTIVE] ') : chalk.gray('[INACTIVE] '))
@@ -305,7 +341,7 @@ module.exports = {
 				)
 
 				availableEnergy += status.active && !status.error ? status.energy * -1 : 0
-				if (status.active && !status.error && status.yeildType === "NRG") {
+				if (status.active && !status.error && status.yieldType === "NRG") {
 					netEnergy += status.yield
 				} else if (status.active && !status.error && status.energy > 0) {
 					netEnergy -= status.energy
