@@ -1,8 +1,13 @@
 const chalk = require("chalk");
 const Table = require('cli-table');
+const Overlap = require("overlap")
+const Box = require("cli-box");
+const fs = require('fs');
 const config = require.main.require('./config.js');
 const server = require.main.require('./bundles/server.js');
 const world = server.bundles.world;
+
+const botGraphic = fs.readFileSync('./ascii-img/bot.txt').toString()
 const colors = {
 	"red": "#FF0000",
 	"green": "#00FF00",
@@ -304,9 +309,9 @@ module.exports = {
 					chalk.whiteBright.bold("NAME"),
 					chalk.whiteBright.bold("NRG COST"),
 					chalk.whiteBright.bold("YIELDS"),
-					chalk.whiteBright.bold("DETAILS")
+					chalk.whiteBright.bold("ACTIVE")
 				],
-				colWidths: [20, 10, 10, 20],
+				colWidths: [20, 10, 8, 8],
 			});
 
 			statuses.forEach(status => {
@@ -335,8 +340,9 @@ module.exports = {
 								? chalk.greenBright(status.yield + " " + status.yieldType)
 								: ""
 						),
-						(status.active ? chalk.greenBright('[ACTIVE] ') : chalk.gray('[INACTIVE] '))
-							+ (status.error ? chalk.redBright(' [ERR]') : '')
+						status.active ? "✅" : ""
+						//(status.active ? chalk.greenBright('[ACTIVE] ') : chalk.gray('[INACTIVE] '))
+						//	+ (status.error ? chalk.redBright(' [ERR]') : '')
 					]
 				)
 
@@ -348,7 +354,23 @@ module.exports = {
 				}
 			})
 
-			output += table.toString() + "\n"
+			//output += table.toString() + "\n"
+
+			const botBot = Box("25x14", {
+				text: botGraphic
+			})
+
+			//output += "\n\n" + botBot.toString() + "\n"
+			//output += "\n\n" + botGraphic + "\n";
+
+			output += Overlap({
+				who: table.toString(),
+				with: botBot,
+				where: {
+					x: 52,
+					y: 2
+				}
+			}) + "\n"
 
 			output += "\nEnergy (NRG) status:\n\n"
 
@@ -454,6 +476,7 @@ module.exports = {
 			} else {
 				output += "Status not found for area " + chalk.bgRed(arguments)
 			}
+
 			socket.emit('output', { msg: output });
 		}
 	},
