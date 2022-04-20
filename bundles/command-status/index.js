@@ -3,11 +3,13 @@ const Table = require('cli-table');
 const Overlap = require("overlap")
 const Box = require("cli-box");
 const fs = require('fs');
+const {botNamesFirst} = require("../character-creator");
 const config = require.main.require('./config.js');
 const server = require.main.require('./bundles/server.js');
 const world = server.bundles.world;
 
 const botGraphic = fs.readFileSync('./ascii-img/bot.txt').toString()
+const BOT_GRAPHIC_WIDTH = 24
 const colors = {
 	"red": "#FF0000",
 	"green": "#00FF00",
@@ -17,6 +19,50 @@ const colors = {
 	"cyan": "#00FFFF",
 	"white": "#FFFFFF"
 }
+
+function statusColor(status) {
+	let col = colors.cyan;
+	if (status.error) {
+		col = colors.red
+	} else if (status.current < status.warningBelow || status.current > status.warningAbove) {
+		col = colors.orange
+	} else if (status.active) {
+		col = colors.green
+	}
+	return col
+}
+
+function colorizeBot(statuses) {
+	const segments = []
+	statuses.forEach(status => {
+		if (status.colorize) {
+			status.colorize.forEach(col => {
+				segments.push({
+					"start": (col.y * BOT_GRAPHIC_WIDTH) + col.x,
+					"len": col.len,
+					"col": statusColor(status)
+				})
+			})
+		}
+	})
+	let botGfx = botGraphic
+	segments
+		.sort((a, b) => { return b.start - a.start })
+		.forEach(data => {
+		botGfx = botGfx.substring(0, data.start)
+			+ chalk.hex(data.col)(botGfx.substring(data.start, data.start + data.len))
+			+ botGfx.substring(data.start + data.len, botGfx.length)
+	})
+	const botBox = Box("25x14", {
+		text: botGfx
+	}).toString()
+	const title = "Bot diagram"
+	return botBox.substring(0, 2) + title + botBox.substring(2 + title.length, botBox.length)
+}
+
+const wrap = (s, w) => s.replace(
+	new RegExp(`(?![^\\n]{1,${w}}$)([^\\n]{1,${w}})\\s`, 'g'), '$1\n'
+);
 
 // command to get the status of the current bot.
 module.exports = {
@@ -60,7 +106,14 @@ module.exports = {
 				"actions": [],
 				"energy": 3,
 				"yield": 0,
-				"yieldType": ""
+				"yieldType": "",
+				"colorize": [
+					{
+						x: 6,
+						y: 7,
+						len: 3
+					}
+				]
 			},
 			{
 				"name": "Radar",
@@ -78,12 +131,19 @@ module.exports = {
 				"actions": ["scan-local"],
 				"energy": 50,
 				"yield": 0,
-				"yieldType": ""
+				"yieldType": "",
+				"colorize": [
+					{
+						x: 5,
+						y: 3,
+						len: 1
+					}
+				]
 			},
 			{
 				"name": "SOS Eye",
 				"type": "Sensor",
-				"description": "Star Orientation System Eye:\nDetermines location in galaxy.",
+				"description": "Star Orientation System Eye: Determines location in galaxy.",
 				"status": "Unknown damage!",
 				"active": false,
 				"error": true,
@@ -96,7 +156,14 @@ module.exports = {
 				"actions": ["scan-local"],
 				"energy": 10,
 				"yield": 0,
-				"yieldType": ""
+				"yieldType": "",
+				"colorize": [
+					{
+						x: 17,
+						y: 3,
+						len: 1
+					}
+				]
 			},
 			{
 				"name": "Memory",
@@ -114,7 +181,14 @@ module.exports = {
 				"actions": [],
 				"energy": 2,
 				"yield": 0,
-				"yieldType": ""
+				"yieldType": "",
+				"colorize": [
+					{
+						x: 6,
+						y: 9,
+						len: 3
+					}
+				]
 			},
 			{
 				"name": "Legs",
@@ -132,12 +206,74 @@ module.exports = {
 				"actions": ["crawl", "push", "latch"],
 				"energy": 10,
 				"yield": 0,
-				"yieldType": ""
+				"yieldType": "",
+				"colorize": [
+					{
+						x: 0,
+						y: 3,
+						len: 3
+					},
+					{
+						x: 2,
+						y: 4,
+						len: 3
+					},
+					{
+						x: 1,
+						y: 6,
+						len: 4
+					},
+					{
+						x: 1,
+						y: 8,
+						len: 4
+					},
+					{
+						x: 2,
+						y: 10,
+						len: 3
+					},
+					{
+						x: 0,
+						y: 11,
+						len: 3
+					},
+					{
+						x: 20,
+						y: 3,
+						len: 3
+					},
+					{
+						x: 18,
+						y: 4,
+						len: 3
+					},
+					{
+						x: 18,
+						y: 6,
+						len: 4
+					},
+					{
+						x: 18,
+						y: 8,
+						len: 4
+					},
+					{
+						x: 18,
+						y: 10,
+						len: 3
+					},
+					{
+						x: 20,
+						y: 11,
+						len: 3
+					},
+				]
 			},
 			{
 				"name": "Arms",
 				"type": "Actuator",
-				"description": "Clamps on arms. May manipulate close-by\nobjects and materials.",
+				"description": "Clamps on arms. May manipulate close-by objects and materials.",
 				"status": "Operational",
 				"active": false,
 				"error": false,
@@ -150,12 +286,44 @@ module.exports = {
 				"actions": ["harvest", "repair", "build"],
 				"energy": 5,
 				"yield": 0,
-				"yieldType": ""
+				"yieldType": "",
+				"colorize": [
+					{
+						x: 6,
+						y: 0,
+						len: 3
+					},
+					{
+						x: 14,
+						y: 0,
+						len: 3
+					},
+					{
+						x: 6,
+						y: 1,
+						len: 1
+					},
+					{
+						x: 16,
+						y: 1,
+						len: 1
+					},
+					{
+						x: 6,
+						y: 2,
+						len: 3
+					},
+					{
+						x: 14,
+						y: 2,
+						len: 3
+					},
+				]
 			},
 			{
 				"name": "Silicon extractor",
 				"type": "Extractor",
-				"description": "Materials processing for silicon, extracting\nfrom rocks and debris.",
+				"description": "Materials processing for silicon, extracting from rocks and debris.",
 				"status": "Operational",
 				"active": false,
 				"error": false,
@@ -168,12 +336,19 @@ module.exports = {
 				"actions": [],
 				"energy": 2,
 				"yield": 1,
-				"yieldType": "SIL"
+				"yieldType": "SIL",
+				"colorize": [
+					{
+						x: 14,
+						y: 5,
+						len: 3
+					}
+				]
 			},
 			{
 				"name": "Metals extractor",
 				"type": "Extractor",
-				"description": "Materials processing for metals, extracting\nfrom rocks and debris.",
+				"description": "Materials processing for metals, extracting from rocks and debris.",
 				"status": "Operational",
 				"active": false,
 				"error": false,
@@ -186,7 +361,14 @@ module.exports = {
 				"actions": [],
 				"energy": 3,
 				"yield": 2,
-				"yieldType": "MET"
+				"yieldType": "MET",
+				"colorize": [
+					{
+						x: 6,
+						y: 5,
+						len: 3
+					}
+				]
 			},
 			{
 				"name": "Materials storage",
@@ -204,7 +386,19 @@ module.exports = {
 				"actions": [],
 				"energy": 0,
 				"yield": 0,
-				"yieldType": ""
+				"yieldType": "",
+				"colorize": [
+					{
+						x: 10,
+						y: 3,
+						len: 3
+					},
+					{
+						x: 10,
+						y: 4,
+						len: 3
+					}
+				]
 			},
 			{
 				"name": "Module factory",
@@ -222,7 +416,14 @@ module.exports = {
 				"actions": ["fabricate"],
 				"energy": 40,
 				"yield": 0.4,
-				"yieldType": "MOD"
+				"yieldType": "MOD",
+				"colorize": [
+					{
+						x: 10,
+						y: 5,
+						len: 3
+					}
+				]
 			},
 			{
 				"name": "Solar panel",
@@ -234,18 +435,25 @@ module.exports = {
 				"level": 1,
 				"max": 100,
 				"current": 5,
-				"valueTerm": "Energy input",
+				"valueTerm": "Energy output",
 				"warningBelow": 20,
 				"warningAbove": 100,
 				"actions": [],
 				"energy": 0,
 				"yield": 6,
-				"yieldType": "NRG"
+				"yieldType": "NRG",
+				"colorize": [
+					{
+						x: 6,
+						y: 10,
+						len: 11
+					}
+				]
 			},
 			{
 				"name": "Battery",
 				"type": "Energy",
-				"description": "Energy storage for bot computer, sensors\nand actuators.",
+				"description": "Energy storage for bot computer, sensors and actuators.",
 				"status": "Low capacity!",
 				"active": true,
 				"error": false,
@@ -258,7 +466,14 @@ module.exports = {
 				"actions": [],
 				"energy": -10,
 				"yield": 0,
-				"yieldType": ""
+				"yieldType": "",
+				"colorize": [
+					{
+						x: 14,
+						y: 9,
+						len: 3
+					}
+				]
 			},
 			{
 				"name": "Fuel",
@@ -276,7 +491,14 @@ module.exports = {
 				"actions": [],
 				"energy": 0,
 				"yield": 0,
-				"yieldType": ""
+				"yieldType": "",
+				"colorize": [
+					{
+						x: 10,
+						y: 9,
+						len: 3
+					}
+				]
 			},
 			{
 				"name": "Ion Engine",
@@ -294,13 +516,27 @@ module.exports = {
 				"actions": ["fly"],
 				"energy": 1000,
 				"yield": 0,
-				"yieldType": ""
+				"yieldType": "",
+				"colorize": [
+					{
+						x: 8,
+						y: 12,
+						len: 7
+					},
+					{
+						x: 8,
+						y: 13,
+						len: 7
+					}
+				]
 			},
 		];
 
+		let output = "";
+
 		// "Status". No arguments (i.e. "status" or "status bot"), so status of bot
 		if (arguments === "" || arguments === "bot") {
-			let output = "Modules status:\n\n";
+			output += "Modules status:\n\n";
 			let netEnergy = 0;
 			let availableEnergy = 0;
 
@@ -315,15 +551,9 @@ module.exports = {
 			});
 
 			statuses.forEach(status => {
-				let col = colors.cyan;
-				if (status.error) {
-					col = colors.red
-				} else if (status.current < status.warningBelow || status.current > status.warningAbove) {
-					col = colors.orange
-				} else if (status.active) {
-					col = colors.green
-				}
+				let col = statusColor(status)
 				const colText = chalk.hex(col)
+
 				let energyUsage = chalk.gray(status.energy)
 				if (status.active && !status.error && status.energy > 0) {
 					energyUsage = chalk.yellowBright(status.energy)
@@ -332,6 +562,7 @@ module.exports = {
 				} else if (status.energy === 0) {
 					energyUsage = ""
 				}
+
 				table.push(
 					[
 						colText(status.name),
@@ -340,9 +571,7 @@ module.exports = {
 								? chalk.greenBright(status.yield + " " + status.yieldType)
 								: ""
 						),
-						status.active ? "✅" : ""
-						//(status.active ? chalk.greenBright('[ACTIVE] ') : chalk.gray('[INACTIVE] '))
-						//	+ (status.error ? chalk.redBright(' [ERR]') : '')
+						status.active ? chalk.greenBright("YES") : ""
 					]
 				)
 
@@ -354,18 +583,11 @@ module.exports = {
 				}
 			})
 
-			//output += table.toString() + "\n"
-
-			const botBot = Box("25x14", {
-				text: botGraphic
-			})
-
-			//output += "\n\n" + botBot.toString() + "\n"
-			//output += "\n\n" + botGraphic + "\n";
+			const botBox = colorizeBot(statuses)
 
 			output += Overlap({
 				who: table.toString(),
-				with: botBot,
+				with: botBox,
 				where: {
 					x: 52,
 					y: 2
@@ -407,42 +629,33 @@ module.exports = {
 			} else {
 				output += chalk.hex(colors.orange)('NEGATIVE net energy: battery WILL deplete')
 			}
-			
-			socket.emit('output', { msg: output });
 		} else if (arguments) {
 			// "Status <object>". Get a specific status
 			const status = statuses.find(el => el.name.toLowerCase() === arguments);
 
-			let output = "";
-			let col = colors.cyan;
-			if (status.error) {
-				col = colors.red
-			} else if (status.current < status.warningBelow || status.current > status.warningAbove) {
-				col = colors.orange
-			} else if (status.active) {
-				col = colors.green
-			}
-			const colText = chalk.hex(col)
-
-			const warning = status.current < status.warningBelow || status.current > status.warningAbove
-			let warningText = ""
-			if (warning) {
-				warningText = "YES - " + status.valueTerm.toLowerCase() + " is too "
-					+ (status.current < status.warningBelow ? "LOW" : "HIGH")
-			}
-
 			if (status) {
+				let col = statusColor(status)
+				const colText = chalk.hex(col)
+
+				const warning = status.current < status.warningBelow || status.current > status.warningAbove
+				let warningText = ""
+				if (warning) {
+					warningText = status.valueTerm.toLowerCase() + " is too "
+						+ (status.current < status.warningBelow ? "LOW" : "HIGH")
+				}
+
+				const maxLine = 27
 				const table = new Table({
-					colWidths: [16, 50]
+					colWidths: [16, 30]
 				});
 				table.push(
-					[chalk.white('Name'), chalk.bold(status.name)],
+					[chalk.white('Name'), chalk.bold(wrap(status.name, maxLine))],
 					[chalk.white('Type'), status.type],
-					[chalk.white('Description'), status.description],
-					[chalk.white('Status'), colText(status.status)],
+					[chalk.white('Description'), wrap(status.description, maxLine)],
+					[chalk.white('Status'), colText(wrap(status.status, maxLine))],
 					[chalk.white('Is Active?'), (status.active ? chalk.greenBright('YES') : chalk.gray('NO'))],
 					[chalk.white('Has Error?'), (status.error ? chalk.redBright('YES') : chalk.gray('NO'))],
-					[chalk.white('Has warning?'), (warning ? chalk.hex(colors.orange)(warningText) : chalk.gray('NO'))]
+					[chalk.white('Warning?'), (warning ? chalk.hex(colors.orange)(wrap(warningText, maxLine)) : chalk.gray('None'))]
 				)
 
 				if (status.valueTerm !== "") {
@@ -464,7 +677,7 @@ module.exports = {
 					]
 				)
 				if (status.yield > 0) {
-					table.push([chalk.white('Yield'), chalk.bold(status.yield) + " units per hour"])
+					table.push([chalk.white('Yield'), chalk.bold(status.yield) + " " + status.yieldType + " per hour"])
 				}
 				let actions = chalk.gray("None")
 				if (status.actions.length !== 0) {
@@ -472,12 +685,20 @@ module.exports = {
 				}
 				table.push([chalk.white('Actions'), actions])
 
-				output += table.toString() + '\n';
+				const botBox = colorizeBot([status])
+
+				output += Overlap({
+					who: table.toString(),
+					with: botBox,
+					where: {
+						x: 50,
+						y: 2
+					}
+				}) + "\n"
 			} else {
 				output += "Status not found for area " + chalk.bgRed(arguments)
 			}
-
-			socket.emit('output', { msg: output });
 		}
+		socket.emit('output', { msg: output });
 	},
 }
