@@ -31,20 +31,12 @@ module.exports = {
 		//arguments = arguments.toLowerCase();
 
 		// TODO : add task details for harvest task
-		const task = new tasks.Task()
+		const task = tasks.createTask("Harvesting materials")
 
 		const result = tasks.addTask(
 			task, character, socket
 		)
 
-		let output = ""
-
-		if (result) {
-			output += chalk.green("Task \"" + task.name + "\" started")
-		} else {
-			output += chalk.red("Task \"" + task.name + "\" could NOT be started")
-		}
-
-		socket.emit('output', { msg: output });
+		socket.emit('output', { msg: result.msg });
 	},
 }
