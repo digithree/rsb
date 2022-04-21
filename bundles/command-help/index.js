@@ -31,7 +31,6 @@ module.exports = {
 				status.actions.forEach(action => disabledCommands.push(action))
 			}
 		})
-		console.log("disabledCommands = " + disabledCommands)
 		
 		// "help" without argument. Display all available commands. 
 		if (arguments === "") {

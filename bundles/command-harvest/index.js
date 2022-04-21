@@ -4,6 +4,8 @@
 //const Box = require("cli-box");
 //const fs = require('fs');
 //const config = require.main.require('./config.js');
+const chalk = require("chalk");
+const tasks = require.main.require("./bundles/tasks.js");
 const server = require.main.require('./bundles/server.js');
 //const world = server.bundles.world;
 
@@ -26,8 +28,23 @@ module.exports = {
 		if (!socket) { return; }
 		
 		// Make arguments case-insensitive
-		arguments = arguments.toLowerCase();
+		//arguments = arguments.toLowerCase();
 
-		socket.emit('output', { msg: "Command harvest is not implemented yet!" });
+		// TODO : add task details for harvest task
+		const task = tasks.Task()
+
+		const result = tasks.addTask(
+			task, character, socket
+		)
+
+		let output = ""
+
+		if (result) {
+			output += chalk.green("Task \"" + task.name + "\" started")
+		} else {
+			output += chalk.red("Task \"" + task.name + "\" could NOT be started")
+		}
+
+		socket.emit('output', { msg: output });
 	},
 }

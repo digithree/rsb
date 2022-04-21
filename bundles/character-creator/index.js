@@ -216,7 +216,7 @@ module.exports = {
 			"active": true,
 			"error": false,
 			"level": 1,
-			"max": 1048576, //2^20
+			"max": 2048, //2^11
 			"current": 128,
 			"valueTerm": "Bytes",
 			"warningBelow": 1024,
