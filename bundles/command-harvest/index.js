@@ -31,7 +31,7 @@ module.exports = {
 		//arguments = arguments.toLowerCase();
 
 		// TODO : add task details for harvest task
-		const task = tasks.Task()
+		const task = new tasks.Task()
 
 		const result = tasks.addTask(
 			task, character, socket

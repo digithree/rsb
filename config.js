@@ -55,6 +55,7 @@ module.exports = {
 		//"command-inventory",
 		//"command-get",
 		//"command-drop",
+		"command-activate",
 		"command-status",
 		"command-harvest",
 	],
