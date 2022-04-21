@@ -67,7 +67,8 @@ module.exports = {
 			type: "og-bot",
 			level: 1,
 			playerCharacter: true,
-			modules: this.startingModuleStatuses
+			modules: this.startingModuleStatuses,
+			tasks: []
 		});
 
 		socket.account.characters.push(server.db.getId(character));
@@ -195,7 +196,7 @@ module.exports = {
 			"valueTerm": "",
 			"warningBelow": 0,
 			"warningAbove": 1,
-			"actions": ["scan-local"],
+			"actions": ["scan-far"],
 			"energy": 10,
 			"yield": 0,
 			"yieldType": "",

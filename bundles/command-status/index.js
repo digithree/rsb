@@ -68,13 +68,14 @@ const wrap = (s, w) => s.replace(
 module.exports = {
 	// called when bundle is loaded
 	init : function () {
-		const command = {};
-
-		command["keywords"] = ["status", "s"];
-		command["run"] = this.runCommand;
-		command["helpCategory"] = "Information";
-		command["helpSyntax"] = ["status", "status <area>"];
-		command["helpText"] = "Display the current bot status.";		
+		const command = {
+			"keywords": ["status", "s"],
+			"run": this.runCommand,
+			"helpCategory": "Information",
+			"helpSyntax": ["status", "status <area>"],
+			"helpText": "Display the current bot status.",
+			"enabled": true
+		};
 		
 		server.commands.push(command);
 	},

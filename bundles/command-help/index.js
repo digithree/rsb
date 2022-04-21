@@ -5,13 +5,13 @@ const server = require.main.require('./bundles/server.js');
 module.exports = {
 	// called when bundle is loaded
 	init : function () {
-		const command = {};
-
-		command["keywords"] = ["help", "h"];
-		command["run"] = this.runCommand.bind(this);
-		command["helpCategory"] = "Meta";
-		command["helpSyntax"] = ["help", "help <command>"];		
-		command["helpText"] = "Shows a list of all available commands ('help'), or information about a specific command ('help <command>').";		
+		const command = {
+			"keywords": ["help", "h"],
+			"run": this.runCommand.bind(this),
+			"helpCategory": "Meta",
+			"helpSyntax": ["help", "help <command>"],
+			"helpText": "Shows a list of all available commands ('help'), or information about a specific command ('help <command>')."
+		};
 		
 		server.commands.push(command);
 	},
@@ -23,6 +23,15 @@ module.exports = {
 		if (!socket) { return; }
 		
 		arguments = arguments.toLowerCase();
+
+		// list of disabled commands from the current player character
+		const disabledCommands = [];
+		character.modules.forEach(status => {
+			if (!status.active) {
+				status.actions.forEach(action => disabledCommands.push(action))
+			}
+		})
+		console.log("disabledCommands = " + disabledCommands)
 		
 		// "help" without argument. Display all available commands. 
 		if (arguments === "") {
@@ -32,17 +41,20 @@ module.exports = {
 			const commandsByCategory = {};
 			for (i = 0; i < server.commands.length; i++) {
 				let command = server.commands[i];
-				commandList[command.keywords[0]] = command;
-				commandOrder.push(command.keywords[0]);
-				if (command.helpCategory && categories.indexOf(command.helpCategory) === -1) {
-					categories.push(command.helpCategory);
-				}
+				// if command not disabled
+				if (disabledCommands.find(el => { return command.keywords.find(el2 => { return el2 === el }) }) === undefined) {
+					commandList[command.keywords[0]] = command;
+					commandOrder.push(command.keywords[0]);
+					if (command.helpCategory && categories.indexOf(command.helpCategory) === -1) {
+						categories.push(command.helpCategory);
+					}
 
-				if (!commandsByCategory[command.helpCategory]) {
-					commandsByCategory[command.helpCategory] = [];
+					if (!commandsByCategory[command.helpCategory]) {
+						commandsByCategory[command.helpCategory] = [];
+					}
+					commandsByCategory[command.helpCategory].push(command.keywords[0]);
+					commandsByCategory[command.helpCategory].sort()
 				}
-				commandsByCategory[command.helpCategory].push(command.keywords[0]);
-				commandsByCategory[command.helpCategory].sort()
 			}
 			commandOrder.sort();
 			categories.sort();
@@ -73,6 +85,13 @@ module.exports = {
 					hasMatch = true;
 					break;
 				}
+			}
+
+			// check if a command is disabled
+			if (hasMatch
+				&& disabledCommands.find(el => { return command.keywords.find(el2 => { return el2 === el }) }) !== undefined
+			) {
+				hasMatch = false
 			}
 			
 			if (!hasMatch) {

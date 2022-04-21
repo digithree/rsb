@@ -56,6 +56,7 @@ module.exports = {
 		//"command-get",
 		//"command-drop",
 		"command-status",
+		"command-harvest",
 	],
 
 	// initial bundle to run

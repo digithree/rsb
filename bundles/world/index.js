@@ -169,6 +169,14 @@ module.exports = {
 		const commandString = parsedInput && parsedInput[1] ? parsedInput[1].toLowerCase() : "";
 		const argumentsString = parsedInput && parsedInput[2] ? parsedInput[2] : "";
 
+		// list of disabled commands from the current player character
+		const disabledCommands = [];
+		character.modules.forEach(status => {
+			if (!status.active) {
+				status.actions.forEach(action => disabledCommands.push(action))
+			}
+		})
+
 		// Loop through all commands until we have a match
 		let hasMatch = false;
 		for (let i = 0; i < server.commands.length; i++) {
@@ -176,8 +184,14 @@ module.exports = {
 
 			// Check if the typed in command matches any of the current command's keywords
 			if (command.keywords.indexOf(commandString) !== -1) {
-				// We have a match! Run command
-				command.run(argumentsString, character, socket);
+				// We have a match!
+
+				// if command not disabled
+				if (disabledCommands.find(el => { return command.keywords.find(el2 => { return el2 === el }) }) === undefined) {
+					command.run(argumentsString, character, socket);
+				} else {
+					socket.emit('output', { msg: chalk.red("Command is DISABLED.") });
+				}
 				
 				// And exit from loop, we don't want more matches.
 				hasMatch = true;
