@@ -172,7 +172,7 @@ module.exports = {
 		// list of disabled commands from the current player character
 		const disabledCommands = [];
 		character.modules.forEach(status => {
-			if (!status.active) {
+			if (status.error) {
 				status.actions.forEach(action => disabledCommands.push(action))
 			}
 		})

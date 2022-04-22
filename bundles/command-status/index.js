@@ -20,19 +20,24 @@ const colors = {
 	"white": "#FFFFFF"
 }
 
-function statusColor(status) {
+function statusColor(status, character) {
+	const isTaskActive = character.tasks.find(task => { return task.moduleName === status.name }) !== undefined
+	const permType = status.type === "perm"
+
 	let col = colors.cyan;
 	if (status.error) {
 		col = colors.red
 	} else if (status.current < status.warningBelow || status.current > status.warningAbove) {
 		col = colors.orange
-	} else if (status.active) {
+	} else if (permType) {
 		col = colors.green
+	} else if (isTaskActive) {
+		col = colors.magenta
 	}
 	return col
 }
 
-function colorizeBot(statuses) {
+function colorizeBot(statuses, character) {
 	const segments = []
 	statuses.forEach(status => {
 		if (status.colorize) {
@@ -40,7 +45,7 @@ function colorizeBot(statuses) {
 				segments.push({
 					"start": (col.y * BOT_GRAPHIC_WIDTH) + col.x,
 					"len": col.len,
-					"col": statusColor(status)
+					"col": statusColor(status, character)
 				})
 			})
 		}
@@ -108,39 +113,49 @@ module.exports = {
 			});
 
 			statuses.forEach(status => {
-				let col = statusColor(status)
+				let col = statusColor(status, character)
 				const colText = chalk.hex(col)
 
+				const isTaskActive = character.tasks.find(task => { return task.moduleName === status.name }) !== undefined
+				const permType = status.type === "perm"
+
 				let energyUsage = chalk.gray(status.energy)
-				if (status.active && !status.error && status.energy > 0) {
+				if (isTaskActive && !status.error && status.energy > 0) {
 					energyUsage = chalk.yellowBright(status.energy)
-				} else if (status.active && !status.error && status.energy < 0) {
+				} else if (isTaskActive && !status.error && status.energy < 0) {
 					energyUsage = chalk.greenBright(status.energy)
 				} else if (status.energy === 0) {
 					energyUsage = ""
+				}
+
+				let activeText = ""
+				if (permType) {
+					activeText = chalk.green("PERM")
+				} else if (isTaskActive) {
+					activeText = chalk.hex(colors.magenta)("TASK")
 				}
 
 				table.push(
 					[
 						colText(status.name),
 						energyUsage,
-						(status.active && !status.error && status.yieldType !== ""
+						((isTaskActive || permType) && !status.error && status.yieldType !== ""
 								? chalk.greenBright(status.yield + " " + status.yieldType)
 								: ""
 						),
-						status.active ? chalk.greenBright("YES") : ""
+						activeText
 					]
 				)
 
-				availableEnergy += status.active && !status.error ? status.energy * -1 : 0
-				if (status.active && !status.error && status.yieldType === "NRG") {
+				availableEnergy += (isTaskActive || permType) && !status.error ? status.energy * -1 : 0
+				if ((isTaskActive || permType) && !status.error && status.yieldType === "NRG") {
 					netEnergy += status.yield
-				} else if (status.active && !status.error && status.energy > 0) {
+				} else if ((isTaskActive || permType) && !status.error && status.energy > 0) {
 					netEnergy -= status.energy
 				}
 			})
 
-			const botBox = colorizeBot(statuses)
+			const botBox = colorizeBot(statuses, character)
 
 			output += Overlap({
 				who: table.toString(),
@@ -191,7 +206,7 @@ module.exports = {
 			const status = statuses.find(el => el.name.toLowerCase() === arguments);
 
 			if (status) {
-				let col = statusColor(status)
+				let col = statusColor(status, character)
 				const colText = chalk.hex(col)
 
 				const warning = status.current < status.warningBelow || status.current > status.warningAbove
@@ -205,14 +220,29 @@ module.exports = {
 				const table = new Table({
 					colWidths: [16, 30]
 				});
+
+				const activeTask = character.tasks.find(task => { return task.moduleName === status.name })
+
+				let activity = ""
+				if (status.type === "perm") {
+					activity = colText(wrap("Permanently active", maxLine))
+				} else if (status.type === "tasks") {
+					if (activeTask) {
+						activity = colText(wrap("Task active: " + activeTask.name, maxLine))
+					} else {
+						activity = chalk.gray(wrap("No task currently active", maxLine))
+					}
+				}
+
 				table.push(
 					[chalk.white('Name'), chalk.bold(wrap(status.name, maxLine))],
-					[chalk.white('Type'), status.type],
+					[chalk.white('Category'), status.category],
+					[chalk.white('Type'), status.type.toUpperCase()],
 					[chalk.white('Description'), wrap(status.description, maxLine)],
 					[chalk.white('Status'), colText(wrap(status.status, maxLine))],
-					[chalk.white('Is Active?'), (status.active ? chalk.greenBright('YES') : chalk.gray('NO'))],
-					[chalk.white('Has Error?'), (status.error ? chalk.redBright('YES') : chalk.gray('NO'))],
-					[chalk.white('Warning?'), (warning ? chalk.hex(colors.orange)(wrap(warningText, maxLine)) : chalk.gray('None'))]
+					[chalk.white('Error?'), (status.error ? chalk.redBright('ERROR') : chalk.gray('None'))],
+					[chalk.white('Warning?'), (warning ? chalk.hex(colors.orange)(wrap(warningText, maxLine)) : chalk.gray('None'))],
+					[chalk.white('Activity'), activity],
 				)
 
 				if (status.valueTerm !== "") {
@@ -230,7 +260,10 @@ module.exports = {
 					[
 						chalk.white('Energy usage'),
 						(status.energy <= 0 ? chalk.green(status.energy) : chalk.yellowBright(status.energy))
-							+ (!status.active ? chalk.gray(" when active") : "")
+							+ (!(status.type === "perm" || activeTask !== undefined)
+								? chalk.gray(" when active")
+								: ""
+							)
 					]
 				)
 				if (status.yield > 0) {
@@ -242,7 +275,7 @@ module.exports = {
 				}
 				table.push([chalk.white('Actions'), actions])
 
-				const botBox = colorizeBot([status])
+				const botBox = colorizeBot([status], character)
 
 				output += Overlap({
 					who: table.toString(),

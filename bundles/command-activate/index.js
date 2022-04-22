@@ -48,10 +48,10 @@ module.exports = {
 		let availableEnergy = 0;
 
 		character.modules.forEach(status => {
-			availableEnergy += status.active && !status.error ? status.energy * -1 : 0
-			if (status.active && !status.error && status.yieldType === "NRG") {
+			availableEnergy += !status.error ? status.energy * -1 : 0
+			if (!status.error && status.yieldType === "NRG") {
 				netEnergy += status.yield
-			} else if (status.active && !status.error && status.energy > 0) {
+			} else if (!status.error && status.energy > 0) {
 				netEnergy -= status.energy
 			}
 		})
@@ -66,7 +66,8 @@ module.exports = {
 		}
 
 		// update the status, takes effect in DB as is same object and DB is a mem based DB
-		status.active = true
+		// TODO : this whole module needs to be rethought
+		//status.active = true
 
 		const netNetEnergy = netEnergy - status.energy
 

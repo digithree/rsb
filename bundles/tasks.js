@@ -1,8 +1,10 @@
 const chalk = require("chalk");
 module.exports = {
-    createTask : function (name) {
+    createTask : function (name, cmd, module) {
         return {
-            "name": name
+            "name": name,
+            "cmd": cmd,
+            "moduleName": module.name
         }
     },
 

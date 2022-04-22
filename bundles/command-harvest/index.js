@@ -30,8 +30,19 @@ module.exports = {
 		// Make arguments case-insensitive
 		//arguments = arguments.toLowerCase();
 
+		const armsModule = character.modules.find(module => { return module.name === "Arms" })
+
+		if (armsModule === undefined) {
+			socket.emit('output', { msg: chalk.red("Arms module could not be found, software error!") });
+			return;
+		}
+
 		// TODO : add task details for harvest task
-		const task = tasks.createTask("Harvesting materials")
+		const task = tasks.createTask(
+			"Harvesting materials",
+			"harvest",
+			armsModule
+		)
 
 		const result = tasks.addTask(
 			task, character, socket
