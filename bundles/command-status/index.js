@@ -127,9 +127,9 @@ module.exports = {
 				const permType = module.type === "perm"
 
 				let energyUsage = padGrayDots("" + module.energy, costPadWidth, chalk.gray)
-				if (isTaskActive && !module.error && module.energy > 0) {
+				if ((isTaskActive || permType) && !module.error && module.energy > 0) {
 					energyUsage = padGrayDots("" + module.energy, costPadWidth, chalk.yellowBright)
-				} else if (isTaskActive && !module.error && module.energy < 0) {
+				} else if ((isTaskActive || permType) && !module.error && module.energy < 0) {
 					energyUsage = padGrayDots("" + module.energy, costPadWidth, chalk.greenBright)
 				} else if (module.energy === 0) {
 					energyUsage = padGrayDots("", costPadWidth)
