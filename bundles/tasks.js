@@ -25,7 +25,7 @@ module.exports = {
 
         // storage modules
         const batteryModule = character.modules.find(el => { return el.name === "Battery"})
-        const storageModule = character.modules.find(el => { return el.name === "Materials storage"})
+        const storageModule = character.modules.find(el => { return el.name === "Storage"})
 
         let result = {
             added: true,
@@ -51,7 +51,7 @@ module.exports = {
                     }
                 }
             } else {
-                // in materials storage
+                // in Storage
                 const materialStored = character.storage.find(stored => { return item.type === stored.type })
 
                 if (materialStored === undefined) {
@@ -99,7 +99,7 @@ module.exports = {
                     const energyDiff = energyStats.netEnergy - item.amount
                     batteryModule.current += energyDiff
                 } else {
-                    // in materials storage
+                    // in Storage
                     const materialStored = character.storage.find(stored => { return item.type === stored.type })
                     materialStored.amount -= item.amount
                     storageNetReduce += item.amount

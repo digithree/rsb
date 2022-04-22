@@ -102,7 +102,7 @@ module.exports = {
 			output += "Modules status:\n\n";
 			const energyStats = energy.energyStats(character)
 			const batteryModule = character.modules.find(el => { return el.name === "Battery"})
-			const storageModule = character.modules.find(el => { return el.name === "Materials storage"})
+			const storageModule = character.modules.find(el => { return el.name === "Storage"})
 
 			let table = new Table({
 				head: [
@@ -272,7 +272,7 @@ module.exports = {
 						]
 					)
 				}
-				if (module.name === "Materials storage") {
+				if (module.name === "Storage") {
 					let storageText = ""
 					if (character.storage.length > 0) {
 						let first = true

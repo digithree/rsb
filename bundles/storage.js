@@ -1,10 +1,10 @@
 const chalk = require("chalk");
 module.exports = {
     storeMaterials : function (materials, character, socket) {
-        const storageModule = character.modules.find(module => { return module.name === "Materials storage" })
+        const storageModule = character.modules.find(module => { return module.name === "Storage" })
 
         if (storageModule === undefined) {
-            socket.emit('output', { msg: chalk.red("Materials storage module could not be found, software error!") });
+            socket.emit('output', { msg: chalk.red("Storage module could not be found, software error!") });
             return;
         }
 

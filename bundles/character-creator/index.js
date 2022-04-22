@@ -415,7 +415,7 @@ module.exports = {
 			]
 		},
 		{
-			"name": "Materials storage",
+			"name": "Storage",
 			"type": "perm",
 			"category": "Storage",
 			"description": "General purpose storage for materials.",
