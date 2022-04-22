@@ -1,11 +1,12 @@
 const chalk = require("chalk");
 const server = require.main.require('./bundles/server.js');
+const energy = require.main.require('./bundles/energy.js');
 
 module.exports = {
     "TIME_UNIT": 1000, // 1 sec
     "TIME_UNIT_READABLE": "sec", // 1 sec
 
-    createTask : function (name, level, bundle, moduleName, duration, payload) {
+    createTask : function (name, level, bundle, moduleName, duration, costs, payload) {
         return {
             "name": name,
             "level": level,
@@ -13,6 +14,7 @@ module.exports = {
             "moduleName": moduleName,
             "startTime": (new Date()).getTime(),
             "duration": duration,
+            "costs": costs,
             "payload": payload,
             "complete": false
         }
@@ -20,25 +22,91 @@ module.exports = {
 
     addTask : function (task, character, socket) {
         const memoryBytes = character.modules.find(el => { return el.name === "Memory"}).current
-        const maxTasks = (Math.floor(Math.log(memoryBytes) / Math.log(2))) - 6
-        console.log("Max tasks: " + maxTasks)
+
+        // storage modules
+        const batteryModule = character.modules.find(el => { return el.name === "Battery"})
+        const storageModule = character.modules.find(el => { return el.name === "Materials storage"})
+
         let result = {
             added: true,
             msg: chalk.green("Task \"" + task.name + "\" started")
         }
-        if (character.tasks.length >= maxTasks) {
-            result = {
-                added: false,
-                msg: chalk.red("Task \"" + task.name + "\" could NOT be started, not enough memory!")
+
+        //validate costs
+        let costAfforded = true
+        task.costs.forEach(item => {
+            if (!costAfforded) return
+            if (item.type === "NRG") {
+                // use battery
+                const energyStats = energy.energyStats(character)
+
+                const energyDiff = energyStats.netEnergy - item.amount
+                const batteryRemaining = batteryModule.current + energyDiff
+                if (batteryRemaining < 0) {
+                    costAfforded = false
+                    result = {
+                        added: false,
+                        msg: chalk.red("Task \"" + task.name + "\" could NOT be started, not enough NRG (need "
+                            + (batteryRemaining * -1) + ")")
+                    }
+                }
+            } else {
+                // in materials storage
+                const materialStored = character.storage.find(stored => { return item.type === stored.type })
+
+                if (materialStored === undefined) {
+                    costAfforded = false
+                    result = {
+                        added: false,
+                        msg: chalk.red("Task \"" + task.name + "\" could NOT be started, not enough " + item.type
+                            + " (need " + item.amount + ")")
+                    }
+                } else if (materialStored.amount - item.amount < 0) {
+                    costAfforded = false
+                    result = {
+                        added: false,
+                        msg: chalk.red("Task \"" + task.name + "\" could NOT be started, not enough " + item.type
+                            + " (need " + ((materialStored.amount - item.amount) * -1) + ")")
+                    }
+                }
             }
-        } else if (character.tasks.find(el => { return el.name === task.name}) !== undefined) {
-            result = {
-                added: false,
-                msg: chalk.red("Task \"" + task.name + "\" could NOT be started, this task already active!")
+        })
+        // TODO : check enough room to store any gathered or processed materials
+
+        if (costAfforded) {
+            const maxTasks = (Math.floor(Math.log(memoryBytes) / Math.log(2))) - 6
+            if (character.tasks.length >= maxTasks) {
+                result = {
+                    added: false,
+                    msg: chalk.red("Task \"" + task.name + "\" could NOT be started, not enough memory!")
+                }
+            } else if (character.tasks.find(el => { return el.name === task.name}) !== undefined) {
+                result = {
+                    added: false,
+                    msg: chalk.red("Task \"" + task.name + "\" could NOT be started, this task already active!")
+                }
             }
         }
+
         socket.emit('output', { msg: result.msg });
         if (result.added) {
+            // apply costs
+            let storageNetReduce = 0
+            task.costs.forEach(item => {
+                if (item.type === "NRG") {
+                    // use battery
+                    const energyStats = energy.energyStats(character)
+                    const energyDiff = energyStats.netEnergy - item.amount
+                    batteryModule.current += energyDiff
+                } else {
+                    // in materials storage
+                    const materialStored = character.storage.find(stored => { return item.type === stored.type })
+                    materialStored.amount -= item.amount
+                    storageNetReduce += item.amount
+                }
+            })
+            storageModule.current -= storageNetReduce
+            // add task to queue
             character.tasks.push(task)
             this.processTasks(character, socket, task.startTime)
         }

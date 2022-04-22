@@ -5,6 +5,7 @@ const Box = require("cli-box");
 const fs = require('fs');
 const tasks = require.main.require("./bundles/tasks.js");
 const server = require.main.require('./bundles/server.js');
+const energy = require.main.require('./bundles/energy.js');
 
 const botGraphic = fs.readFileSync('./ascii-img/bot.txt').toString()
 const BOT_GRAPHIC_WIDTH = 24
@@ -99,8 +100,9 @@ module.exports = {
 		// "Status". No arguments (i.e. "status" or "status bot"), so status of bot
 		if (arguments === "" || arguments === "bot") {
 			output += "Modules status:\n\n";
-			let netEnergy = 0;
-			let availableEnergy = 0;
+			const energyStats = energy.energyStats(character)
+			const batteryModule = character.modules.find(el => { return el.name === "Battery"})
+			const storageModule = character.modules.find(el => { return el.name === "Materials storage"})
 
 			let table = new Table({
 				head: [
@@ -109,13 +111,13 @@ module.exports = {
 					chalk.whiteBright.bold("YIELDS"),
 					chalk.whiteBright.bold("ACTIVE")
 				],
-				colWidths: [20, 10, 8, 8],
+				colWidths: [20, 10, 9, 8],
 				chars: {'mid': '', 'left-mid': '', 'mid-mid': '', 'right-mid': ''}
 			});
 
 			const namePadWidth = 18
 			const costPadWidth = 8
-			const yieldsPadWidth = 6
+			const yieldsPadWidth = 7
 
 			character.modules.forEach(module => {
 				let col = moduleColor(module, character)
@@ -146,18 +148,11 @@ module.exports = {
 						energyUsage,
 						((isTaskActive || permType) && !module.error && module.yieldType !== ""
 								? chalk.greenBright(module.yield + " " + module.yieldType)
-								: padGrayDots("", yieldsPadWidth)
+								: chalk.gray(module.yield + " " + module.yieldType) //padGrayDots("", yieldsPadWidth)
 						),
 						activeText
 					]
 				)
-
-				availableEnergy += (isTaskActive || permType) && !module.error ? module.energy * -1 : 0
-				if ((isTaskActive || permType) && !module.error && module.yieldType === "NRG") {
-					netEnergy += module.yield
-				} else if ((isTaskActive || permType) && !module.error && module.energy > 0) {
-					netEnergy -= module.energy
-				}
 			})
 
 			const botBox = colorizeBot(character.modules, character)
@@ -166,12 +161,12 @@ module.exports = {
 				who: table.toString(),
 				with: botBox,
 				where: {
-					x: 52,
+					x: 53,
 					y: 1
 				}
 			}) + "\n"
 
-			output += "\nEnergy (NRG) status:\n\n"
+			output += "\nResources:\n\n"
 
 			table = new Table({
 				colWidths: [20, 10],
@@ -179,30 +174,41 @@ module.exports = {
 			});
 
 			let col = colors.green
-			if (availableEnergy < 5) {
+			if (energyStats.battery < batteryModule.warningBelow) {
 				col = colors.orange
-			} else if (availableEnergy < 0) {
+			} else if (energyStats.battery < 0) {
 				col = colors.red
 			}
 			let colText = chalk.hex(col);
 			table.push(
-				[padGrayDots("Available energy", namePadWidth, chalk.white), colText(availableEnergy)]
+				[padGrayDots("Battery", namePadWidth, chalk.white), colText(energyStats.battery)]
 			)
 
 			col = colors.green
-			if (netEnergy < 5) {
+			if (energyStats.netEnergy === 0) {
 				col = colors.orange
-			} else if (netEnergy < 0) {
+			} else if (energyStats.netEnergy < 0) {
 				col = colors.red
 			}
 			colText = chalk.hex(col)
 			table.push(
-				[padGrayDots("Net energy", namePadWidth, chalk.white), colText(netEnergy)]
+				[padGrayDots("Net energy", namePadWidth, chalk.white), colText(energyStats.netEnergy)]
+			)
+
+			col = colors.green
+			if (storageModule.current === storageModule.max) {
+				col = colors.red
+			} else if (storageModule.current > storageModule.warningAbove) {
+				col = colors.orange
+			}
+			colText = chalk.hex(col)
+			table.push(
+				[padGrayDots("Storage", namePadWidth, chalk.white), colText(storageModule.current + " / " + storageModule.max)]
 			)
 
 			output += table.toString() + "\n"
 
-			if (netEnergy >= 0) {
+			if (energyStats.netEnergy >= 0) {
 				output += chalk.green('Positive net energy: battery will not deplete')
 			} else {
 				output += chalk.hex(colors.orange)('NEGATIVE net energy: battery WILL deplete')
@@ -284,7 +290,7 @@ module.exports = {
 					[
 						padGrayDots("Energy usage", namePadWidth, chalk.white),
 						(module.energy <= 0 ? chalk.green(module.energy) : chalk.yellowBright(module.energy))
-							+ (module.energy !== 0 ? + chalk.white(" per " + tasks.TIME_UNIT_READABLE) : "")
+							+ (module.energy !== 0 ? chalk.white(" per " + tasks.TIME_UNIT_READABLE) : "")
 							+ (!(module.type === "perm" || activeTask !== undefined)
 								? chalk.gray(", when active")
 								: ""

@@ -1,13 +1,6 @@
-//const chalk = require("chalk");
-//const Table = require('cli-table');
-//const Overlap = require("overlap")
-//const Box = require("cli-box");
-//const fs = require('fs');
-//const config = require.main.require('./config.js');
 const chalk = require("chalk");
-const tasks = require.main.require("./bundles/tasks.js");
+const energy = require.main.require('./bundles/energy.js');
 const server = require.main.require('./bundles/server.js');
-//const world = server.bundles.world;
 
 module.exports = {
 	// called when bundle is loaded
@@ -44,22 +37,12 @@ module.exports = {
 			return;
 		}
 
-		let netEnergy = 0;
-		let availableEnergy = 0;
+		const energyStats = energy.energyStats(character)
 
-		character.modules.forEach(status => {
-			availableEnergy += !status.error ? status.energy * -1 : 0
-			if (!status.error && status.yieldType === "NRG") {
-				netEnergy += status.yield
-			} else if (!status.error && status.energy > 0) {
-				netEnergy -= status.energy
-			}
-		})
-
-		if (availableEnergy - status.energy < 0) {
+		if (energyStats.availableEnergy - status.energy < 0) {
 			socket.emit('output', {
 				msg: chalk.red("Energy required for module " + status.name + " (" + status.energy
-						+ " NRG) is more than available energy (" + availableEnergy + " NRG)"
+						+ " NRG) is more than available energy (" + energyStats.availableEnergy + " NRG)"
 					)
 			});
 			return;

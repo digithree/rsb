@@ -35,8 +35,13 @@ module.exports = {
 			"command-harvest",
 			armsModule.name,
 			10,
+			[
+				{
+					"amount": armsModule.energy,
+					"type": "NRG"
+				}
+			],
 			{
-				"cost": [], //energy cost is implicit, can add any additional costs here
 				"output": [
 					{
 						"amount": 20,
