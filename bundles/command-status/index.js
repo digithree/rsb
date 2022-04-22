@@ -20,14 +20,14 @@ const colors = {
 	"white": "#FFFFFF"
 }
 
-function statusColor(status, character) {
-	const isTaskActive = character.tasks.find(task => { return task.moduleName === status.name }) !== undefined
-	const permType = status.type === "perm"
+function moduleColor(module, character) {
+	const isTaskActive = character.tasks.find(task => { return task.moduleName === module.name }) !== undefined
+	const permType = module.type === "perm"
 
 	let col = colors.cyan;
-	if (status.error) {
+	if (module.error) {
 		col = colors.red
-	} else if (status.current < status.warningBelow || status.current > status.warningAbove) {
+	} else if (module.current < module.warningBelow || module.current > module.warningAbove) {
 		col = colors.orange
 	} else if (permType) {
 		col = colors.green
@@ -37,15 +37,15 @@ function statusColor(status, character) {
 	return col
 }
 
-function colorizeBot(statuses, character) {
+function colorizeBot(modules, character) {
 	const segments = []
-	statuses.forEach(status => {
-		if (status.colorize) {
-			status.colorize.forEach(col => {
+	modules.forEach(module => {
+		if (module.colorize) {
+			module.colorize.forEach(col => {
 				segments.push({
 					"start": (col.y * BOT_GRAPHIC_WIDTH) + col.x,
 					"len": col.len,
-					"col": statusColor(status, character)
+					"col": moduleColor(module, character)
 				})
 			})
 		}
@@ -96,8 +96,6 @@ module.exports = {
 		// Make arguments case-insensitive
 		arguments = arguments.toLowerCase();
 
-		const statuses = character.modules;
-
 		let output = "";
 
 		// "Status". No arguments (i.e. "status" or "status bot"), so status of bot
@@ -121,19 +119,19 @@ module.exports = {
 			const costPadWidth = 8
 			const yieldsPadWidth = 6
 
-			statuses.forEach(status => {
-				let col = statusColor(status, character)
+			character.modules.forEach(module => {
+				let col = moduleColor(module, character)
 				const colText = chalk.hex(col)
 
-				const isTaskActive = character.tasks.find(task => { return task.moduleName === status.name }) !== undefined
-				const permType = status.type === "perm"
+				const isTaskActive = character.tasks.find(task => { return task.moduleName === module.name }) !== undefined
+				const permType = module.type === "perm"
 
-				let energyUsage = padGrayDots("" + status.energy, costPadWidth, chalk.gray)
-				if (isTaskActive && !status.error && status.energy > 0) {
-					energyUsage = padGrayDots("" + status.energy, costPadWidth, chalk.yellowBright)
-				} else if (isTaskActive && !status.error && status.energy < 0) {
-					energyUsage = padGrayDots("" + status.energy, costPadWidth, chalk.greenBright)
-				} else if (status.energy === 0) {
+				let energyUsage = padGrayDots("" + module.energy, costPadWidth, chalk.gray)
+				if (isTaskActive && !module.error && module.energy > 0) {
+					energyUsage = padGrayDots("" + module.energy, costPadWidth, chalk.yellowBright)
+				} else if (isTaskActive && !module.error && module.energy < 0) {
+					energyUsage = padGrayDots("" + module.energy, costPadWidth, chalk.greenBright)
+				} else if (module.energy === 0) {
 					energyUsage = padGrayDots("", costPadWidth)
 				}
 
@@ -146,25 +144,25 @@ module.exports = {
 
 				table.push(
 					[
-						padGrayDots(status.name, namePadWidth, colText),
+						padGrayDots(module.name, namePadWidth, colText),
 						energyUsage,
-						((isTaskActive || permType) && !status.error && status.yieldType !== ""
-								? chalk.greenBright(status.yield + " " + status.yieldType)
+						((isTaskActive || permType) && !module.error && module.yieldType !== ""
+								? chalk.greenBright(module.yield + " " + module.yieldType)
 								: padGrayDots("", yieldsPadWidth)
 						),
 						activeText
 					]
 				)
 
-				availableEnergy += (isTaskActive || permType) && !status.error ? status.energy * -1 : 0
-				if ((isTaskActive || permType) && !status.error && status.yieldType === "NRG") {
-					netEnergy += status.yield
-				} else if ((isTaskActive || permType) && !status.error && status.energy > 0) {
-					netEnergy -= status.energy
+				availableEnergy += (isTaskActive || permType) && !module.error ? module.energy * -1 : 0
+				if ((isTaskActive || permType) && !module.error && module.yieldType === "NRG") {
+					netEnergy += module.yield
+				} else if ((isTaskActive || permType) && !module.error && module.energy > 0) {
+					netEnergy -= module.energy
 				}
 			})
 
-			const botBox = colorizeBot(statuses, character)
+			const botBox = colorizeBot(character.modules, character)
 
 			output += Overlap({
 				who: table.toString(),
@@ -213,17 +211,17 @@ module.exports = {
 			}
 		} else if (arguments) {
 			// "Status <object>". Get a specific status
-			const status = statuses.find(el => el.name.toLowerCase() === arguments);
+			const module = character.modules.find(el => el.name.toLowerCase() === arguments);
 
-			if (status) {
-				let col = statusColor(status, character)
+			if (module) {
+				let col = moduleColor(module, character)
 				const colText = chalk.hex(col)
 
-				const warning = status.current < status.warningBelow || status.current > status.warningAbove
+				const warning = module.current < module.warningBelow || module.current > module.warningAbove
 				let warningText = ""
 				if (warning) {
-					warningText = status.valueTerm.toLowerCase() + " is too "
-						+ (status.current < status.warningBelow ? "LOW" : "HIGH")
+					warningText = module.valueTerm.toLowerCase() + " is too "
+						+ (module.current < module.warningBelow ? "LOW" : "HIGH")
 				}
 
 				const maxLine = 27
@@ -233,12 +231,12 @@ module.exports = {
 				});
 				const namePadWidth = 14
 
-				const activeTask = character.tasks.find(task => { return task.moduleName === status.name })
+				const activeTask = character.tasks.find(task => { return task.moduleName === module.name })
 
 				let activity = ""
-				if (status.type === "perm") {
+				if (module.type === "perm") {
 					activity = colText(wrap("Permanently active", maxLine))
-				} else if (status.type === "tasks") {
+				} else if (module.type === "tasks") {
 					if (activeTask) {
 						activity = colText(wrap("Task active: " + activeTask.name, maxLine))
 					} else {
@@ -247,50 +245,50 @@ module.exports = {
 				}
 
 				table.push(
-					[padGrayDots("Name", namePadWidth, chalk.white), chalk.bold(wrap(status.name, maxLine))],
-					[padGrayDots("Category", namePadWidth, chalk.white), status.category],
-					[padGrayDots("Type", namePadWidth, chalk.white), status.type.toUpperCase()],
-					[padGrayDots("Description", namePadWidth, chalk.white), wrap(status.description, maxLine)],
-					[padGrayDots("Status", namePadWidth, chalk.white), colText(wrap(status.status, maxLine))],
-					[padGrayDots("Error?", namePadWidth, chalk.white), (status.error ? chalk.redBright('ERROR') : chalk.gray('None'))],
+					[padGrayDots("Name", namePadWidth, chalk.white), chalk.bold(wrap(module.name, maxLine))],
+					[padGrayDots("Category", namePadWidth, chalk.white), module.category],
+					[padGrayDots("Type", namePadWidth, chalk.white), module.type.toUpperCase()],
+					[padGrayDots("Description", namePadWidth, chalk.white), wrap(module.description, maxLine)],
+					[padGrayDots("Status", namePadWidth, chalk.white), colText(wrap(module.status, maxLine))],
+					[padGrayDots("Error?", namePadWidth, chalk.white), (module.error ? chalk.redBright('ERROR') : chalk.gray('None'))],
 					[padGrayDots("Warning?", namePadWidth, chalk.white), (warning ? chalk.hex(colors.orange)(wrap(warningText, maxLine)) : chalk.gray('None'))],
 					[padGrayDots("Activity", namePadWidth, chalk.white), activity],
 				)
 
-				if (status.valueTerm !== "") {
+				if (module.valueTerm !== "") {
 					table.push(
 						[
-							padGrayDots(status.valueTerm, namePadWidth, chalk.white),
-							(status.current < status.warningBelow || status.current > status.warningAbove
-									? chalk.yellow(status.current)
-									: chalk.greenBright(status.current)
-							) + chalk.white(' / ' + status.max)
+							padGrayDots(module.valueTerm, namePadWidth, chalk.white),
+							(module.current < module.warningBelow || module.current > module.warningAbove
+									? chalk.yellow(module.current)
+									: chalk.greenBright(module.current)
+							) + chalk.white(' / ' + module.max)
 						]
 					)
 				}
 				table.push(
 					[
 						padGrayDots("Energy usage", namePadWidth, chalk.white),
-						(status.energy <= 0 ? chalk.green(status.energy) : chalk.yellowBright(status.energy))
-							+ (!(status.type === "perm" || activeTask !== undefined)
+						(module.energy <= 0 ? chalk.green(module.energy) : chalk.yellowBright(module.energy))
+							+ (!(module.type === "perm" || activeTask !== undefined)
 								? chalk.gray(" when active")
 								: ""
 							)
 					]
 				)
-				if (status.yield > 0) {
+				if (module.yield > 0) {
 					table.push([
 						padGrayDots("Yield", namePadWidth, chalk.white),
-						chalk.bold(status.yield) + " " + status.yieldType + " per hour"
+						chalk.bold(module.yield) + " " + module.yieldType + " per hour"
 					])
 				}
 				let actions = chalk.gray("None")
-				if (status.actions.length !== 0) {
-					actions = status.actions.join(", ")
+				if (module.actions.length !== 0) {
+					actions = module.actions.join(", ")
 				}
 				table.push([padGrayDots("Actions", namePadWidth, chalk.white), actions])
 
-				const botBox = colorizeBot([status], character)
+				const botBox = colorizeBot([module], character)
 
 				output += Overlap({
 					who: table.toString()+ ("\n" + " ".repeat(16)).repeat(3),

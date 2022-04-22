@@ -67,7 +67,7 @@ module.exports = {
 			type: "og-bot",
 			level: 1,
 			playerCharacter: true,
-			modules: this.startingModuleStatuses,
+			modules: this.startingModules,
 			tasks: []
 		});
 
@@ -132,7 +132,7 @@ module.exports = {
 		"Deed"
 	],
 
-	"startingModuleStatuses": [
+	"startingModules": [
 		{
 			"name": "Radio",
 			"type": "perm",
