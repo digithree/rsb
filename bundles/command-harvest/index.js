@@ -1,13 +1,7 @@
-//const chalk = require("chalk");
-//const Table = require('cli-table');
-//const Overlap = require("overlap")
-//const Box = require("cli-box");
-//const fs = require('fs');
-//const config = require.main.require('./config.js');
 const chalk = require("chalk");
 const tasks = require.main.require("./bundles/tasks.js");
+const storage = require.main.require("./bundles/storage.js");
 const server = require.main.require('./bundles/server.js');
-//const world = server.bundles.world;
 
 module.exports = {
 	// called when bundle is loaded
@@ -26,9 +20,6 @@ module.exports = {
 	runCommand : function (arguments, character, socket) {
 		// Command can only be used by player-controlled characters (not NPC:s)
 		if (!socket) { return; }
-		
-		// Make arguments case-insensitive
-		//arguments = arguments.toLowerCase();
 
 		const armsModule = character.modules.find(module => { return module.name === "Arms" })
 
@@ -40,14 +31,28 @@ module.exports = {
 		// TODO : add task details for harvest task
 		const task = tasks.createTask(
 			"Harvesting materials",
-			"harvest",
-			armsModule
+			armsModule.level,
+			"command-harvest",
+			armsModule.name,
+			10,
+			{
+				"cost": [], //energy cost is implicit, can add any additional costs here
+				"output": [
+					{
+						"amount": 20,
+						"type": "RAW"
+					}
+				]
+			}
 		)
 
 		const result = tasks.addTask(
 			task, character, socket
 		)
-
-		socket.emit('output', { msg: result.msg });
+		// ignore result
 	},
+
+	runTask : function (task, character, socket) {
+		storage.storeMaterials(task.payload.output, character, socket)
+	}
 }

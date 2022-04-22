@@ -3,10 +3,8 @@ const Table = require('cli-table');
 const Overlap = require("overlap")
 const Box = require("cli-box");
 const fs = require('fs');
-const {botNamesFirst} = require("../character-creator");
-const config = require.main.require('./config.js');
+const tasks = require.main.require("./bundles/tasks.js");
 const server = require.main.require('./bundles/server.js');
-const world = server.bundles.world;
 
 const botGraphic = fs.readFileSync('./ascii-img/bot.txt').toString()
 const BOT_GRAPHIC_WIDTH = 24
@@ -266,12 +264,29 @@ module.exports = {
 						]
 					)
 				}
+				if (module.name === "Materials storage") {
+					let storageText = ""
+					if (character.storage.length > 0) {
+						let first = true
+						character.storage.forEach(item => {
+							if (!first) {
+								storageText += "\n"
+							}
+							first = false
+							storageText += "" + item.amount + " " + item.type
+						})
+					} else {
+						storageText = chalk.gray("None")
+					}
+					table.push([padGrayDots("Storage", namePadWidth, chalk.white), storageText])
+				}
 				table.push(
 					[
 						padGrayDots("Energy usage", namePadWidth, chalk.white),
 						(module.energy <= 0 ? chalk.green(module.energy) : chalk.yellowBright(module.energy))
+							+ (module.energy !== 0 ? + chalk.white(" per " + tasks.TIME_UNIT_READABLE) : "")
 							+ (!(module.type === "perm" || activeTask !== undefined)
-								? chalk.gray(" when active")
+								? chalk.gray(", when active")
 								: ""
 							)
 					]

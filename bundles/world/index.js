@@ -1,6 +1,7 @@
 const chalk = require("chalk");
 const config = require.main.require('./config.js');
 const server = require.main.require('./bundles/server.js');
+const tasks = require.main.require("./bundles/tasks.js");
 
 // after choosing a character, you're sent into the game world. This bundle also handles parsing of in-game commands,
 // so should be loaded before any other commands bundles.
@@ -24,6 +25,7 @@ module.exports = {
 		
 		// Start parsing commands
 		socket.on('input', function (data) {
+			tasks.processTasks(socket.character, socket)
 			this.runCommand(data.msg, socket.character);
 		}.bind(this));
 		

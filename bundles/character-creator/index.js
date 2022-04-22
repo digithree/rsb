@@ -68,7 +68,8 @@ module.exports = {
 			level: 1,
 			playerCharacter: true,
 			modules: this.startingModules,
-			tasks: []
+			tasks: [],
+			storage: []
 		});
 
 		socket.account.characters.push(server.db.getId(character));
@@ -426,7 +427,7 @@ module.exports = {
 			"valueTerm": "Capacity",
 			"warningBelow": 0,
 			"warningAbove": 35,
-			"actions": [],
+			"actions": ["dump"],
 			"energy": 0,
 			"yield": 0,
 			"yieldType": "",
