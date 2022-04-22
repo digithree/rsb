@@ -140,6 +140,8 @@ module.exports = {
 					activeText = chalk.green("PERM")
 				} else if (isTaskActive) {
 					activeText = chalk.hex(colors.magenta)("TASK")
+				} else if (!module.error) {
+					activeText = chalk.hex(colors.cyan)("IDLE")
 				}
 
 				table.push(
