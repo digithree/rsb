@@ -69,6 +69,10 @@ const wrap = (s, w) => s.replace(
 	new RegExp(`(?![^\\n]{1,${w}}$)([^\\n]{1,${w}})\\s`, 'g'), '$1\n'
 );
 
+const padGrayDots = (s, w, colFn = (s) => {return s}) => (w - s.length) > 0 ?
+	colFn(s) + chalk.gray(".".repeat(w - s.length))
+	: colFn(s)
+
 // command to get the status of the current bot.
 module.exports = {
 	// called when bundle is loaded
@@ -110,7 +114,12 @@ module.exports = {
 					chalk.whiteBright.bold("ACTIVE")
 				],
 				colWidths: [20, 10, 8, 8],
+				chars: {'mid': '', 'left-mid': '', 'mid-mid': '', 'right-mid': ''}
 			});
+
+			const namePadWidth = 18
+			const costPadWidth = 8
+			const yieldsPadWidth = 6
 
 			statuses.forEach(status => {
 				let col = statusColor(status, character)
@@ -119,13 +128,13 @@ module.exports = {
 				const isTaskActive = character.tasks.find(task => { return task.moduleName === status.name }) !== undefined
 				const permType = status.type === "perm"
 
-				let energyUsage = chalk.gray(status.energy)
+				let energyUsage = padGrayDots("" + status.energy, costPadWidth, chalk.gray)
 				if (isTaskActive && !status.error && status.energy > 0) {
-					energyUsage = chalk.yellowBright(status.energy)
+					energyUsage = padGrayDots("" + status.energy, costPadWidth, chalk.yellowBright)
 				} else if (isTaskActive && !status.error && status.energy < 0) {
-					energyUsage = chalk.greenBright(status.energy)
+					energyUsage = padGrayDots("" + status.energy, costPadWidth, chalk.greenBright)
 				} else if (status.energy === 0) {
-					energyUsage = ""
+					energyUsage = padGrayDots("", costPadWidth)
 				}
 
 				let activeText = ""
@@ -137,11 +146,11 @@ module.exports = {
 
 				table.push(
 					[
-						colText(status.name),
+						padGrayDots(status.name, namePadWidth, colText),
 						energyUsage,
 						((isTaskActive || permType) && !status.error && status.yieldType !== ""
 								? chalk.greenBright(status.yield + " " + status.yieldType)
-								: ""
+								: padGrayDots("", yieldsPadWidth)
 						),
 						activeText
 					]
@@ -162,7 +171,7 @@ module.exports = {
 				with: botBox,
 				where: {
 					x: 52,
-					y: 2
+					y: 1
 				}
 			}) + "\n"
 
@@ -170,6 +179,7 @@ module.exports = {
 
 			table = new Table({
 				colWidths: [20, 10],
+				chars: {'mid': '', 'left-mid': '', 'mid-mid': '', 'right-mid': ''}
 			});
 
 			let col = colors.green
@@ -180,7 +190,7 @@ module.exports = {
 			}
 			let colText = chalk.hex(col);
 			table.push(
-				['Available energy', colText(availableEnergy)]
+				[padGrayDots("Available energy", namePadWidth, chalk.white), colText(availableEnergy)]
 			)
 
 			col = colors.green
@@ -191,7 +201,7 @@ module.exports = {
 			}
 			colText = chalk.hex(col)
 			table.push(
-				['Net energy', colText(netEnergy)]
+				[padGrayDots("Net energy", namePadWidth, chalk.white), colText(netEnergy)]
 			)
 
 			output += table.toString() + "\n"
@@ -218,8 +228,10 @@ module.exports = {
 
 				const maxLine = 27
 				const table = new Table({
-					colWidths: [16, 30]
+					colWidths: [16, 30],
+					chars: {'mid': '', 'left-mid': '', 'mid-mid': '', 'right-mid': ''}
 				});
+				const namePadWidth = 14
 
 				const activeTask = character.tasks.find(task => { return task.moduleName === status.name })
 
@@ -235,20 +247,20 @@ module.exports = {
 				}
 
 				table.push(
-					[chalk.white('Name'), chalk.bold(wrap(status.name, maxLine))],
-					[chalk.white('Category'), status.category],
-					[chalk.white('Type'), status.type.toUpperCase()],
-					[chalk.white('Description'), wrap(status.description, maxLine)],
-					[chalk.white('Status'), colText(wrap(status.status, maxLine))],
-					[chalk.white('Error?'), (status.error ? chalk.redBright('ERROR') : chalk.gray('None'))],
-					[chalk.white('Warning?'), (warning ? chalk.hex(colors.orange)(wrap(warningText, maxLine)) : chalk.gray('None'))],
-					[chalk.white('Activity'), activity],
+					[padGrayDots("Name", namePadWidth, chalk.white), chalk.bold(wrap(status.name, maxLine))],
+					[padGrayDots("Category", namePadWidth, chalk.white), status.category],
+					[padGrayDots("Type", namePadWidth, chalk.white), status.type.toUpperCase()],
+					[padGrayDots("Description", namePadWidth, chalk.white), wrap(status.description, maxLine)],
+					[padGrayDots("Status", namePadWidth, chalk.white), colText(wrap(status.status, maxLine))],
+					[padGrayDots("Error?", namePadWidth, chalk.white), (status.error ? chalk.redBright('ERROR') : chalk.gray('None'))],
+					[padGrayDots("Warning?", namePadWidth, chalk.white), (warning ? chalk.hex(colors.orange)(wrap(warningText, maxLine)) : chalk.gray('None'))],
+					[padGrayDots("Activity", namePadWidth, chalk.white), activity],
 				)
 
 				if (status.valueTerm !== "") {
 					table.push(
 						[
-							chalk.white(status.valueTerm),
+							padGrayDots(status.valueTerm, namePadWidth, chalk.white),
 							(status.current < status.warningBelow || status.current > status.warningAbove
 									? chalk.yellow(status.current)
 									: chalk.greenBright(status.current)
@@ -258,7 +270,7 @@ module.exports = {
 				}
 				table.push(
 					[
-						chalk.white('Energy usage'),
+						padGrayDots("Energy usage", namePadWidth, chalk.white),
 						(status.energy <= 0 ? chalk.green(status.energy) : chalk.yellowBright(status.energy))
 							+ (!(status.type === "perm" || activeTask !== undefined)
 								? chalk.gray(" when active")
@@ -267,22 +279,25 @@ module.exports = {
 					]
 				)
 				if (status.yield > 0) {
-					table.push([chalk.white('Yield'), chalk.bold(status.yield) + " " + status.yieldType + " per hour"])
+					table.push([
+						padGrayDots("Yield", namePadWidth, chalk.white),
+						chalk.bold(status.yield) + " " + status.yieldType + " per hour"
+					])
 				}
 				let actions = chalk.gray("None")
 				if (status.actions.length !== 0) {
 					actions = status.actions.join(", ")
 				}
-				table.push([chalk.white('Actions'), actions])
+				table.push([padGrayDots("Actions", namePadWidth, chalk.white), actions])
 
 				const botBox = colorizeBot([status], character)
 
 				output += Overlap({
-					who: table.toString(),
+					who: table.toString()+ ("\n" + " ".repeat(16)).repeat(3),
 					with: botBox,
 					where: {
 						x: 50,
-						y: 2
+						y: 0
 					}
 				}) + "\n"
 			} else {
