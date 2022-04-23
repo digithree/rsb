@@ -140,8 +140,9 @@ module.exports = {
 			"category": "Communications",
 			"description": "Allows for remote control and communication.",
 			"status": "Operational",
-			"error": false,
 			"level": 1,
+			"upgradeable": false,
+			"upgradeSpec": [],
 			"max": 1,
 			"current": 1,
 			"valueTerm": "",
@@ -165,14 +166,38 @@ module.exports = {
 			"category": "Sensor",
 			"description": "Sees local area.",
 			"status": "Unknown damage!",
-			"error": true,
-			"level": 1,
+			"level": 0, // level 0 means error
+			"upgradeable": true,
+			"upgradeSpec": [
+				{
+					"level": 1,
+					"costs": [
+						{
+							type: "NRG",
+							amount: 60
+						},
+						{
+							type: "MET",
+							amount: 10
+						},
+						{
+							type: "SIL",
+							amount: 55
+						}
+					],
+					"duration": 100,
+					"changes": {
+						"status": "Operational",
+						"actions": ["scan-local"]
+					}
+				}
+			],
 			"max": 1,
 			"current": 0,
 			"valueTerm": "",
 			"warningBelow": 0,
 			"warningAbove": 1,
-			"actions": ["scan-local"],
+			"actions": [],
 			"energy": 50,
 			"yield": 0,
 			"yieldType": "",
@@ -190,14 +215,38 @@ module.exports = {
 			"category": "Sensor",
 			"description": "Star Orientation System Eye: Determines location in galaxy.",
 			"status": "Unknown damage!",
-			"error": true,
-			"level": 1,
+			"level": 0,
+			"upgradeable": true,
+			"upgradeSpec": [
+				{
+					"level": 1,
+					"costs": [
+						{
+							type: "NRG",
+							amount: 80
+						},
+						{
+							type: "MET",
+							amount: 60
+						},
+						{
+							type: "SIL",
+							amount: 120
+						}
+					],
+					"duration": 400,
+					"changes": {
+						"status": "Operational",
+						"actions": ["scan-far"],
+					}
+				}
+			],
 			"max": 1,
 			"current": 0,
 			"valueTerm": "",
 			"warningBelow": 0,
 			"warningAbove": 1,
-			"actions": ["scan-far"],
+			"actions": [],
 			"energy": 10,
 			"yield": 0,
 			"yieldType": "",
@@ -215,17 +264,43 @@ module.exports = {
 			"category": "Circuitry",
 			"description": "Onboard computer memory. Capacity limits operations.",
 			"status": "Reduced capacity!",
-			"error": false,
 			"level": 1,
+			"upgradeable": true,
+			"upgradeSpec": [
+				{
+					"level": 2,
+					"costs": [
+						{
+							type: "NRG",
+							amount: 30
+						},
+						{
+							type: "MET",
+							amount: 5
+						},
+						{
+							type: "SIL",
+							amount: 30
+						}
+					],
+					"duration": 20,
+					"changes": {
+						"current": 256,
+						"energy": 4
+					}
+				}
+				// TODO : more levels
+			],
 			"max": 2048, //2^11
 			"current": 128,
 			"valueTerm": "Bytes",
-			"warningBelow": 1024,
+			"warningBelow": 256,
 			"warningAbove": 1048576, //2^20
 			"actions": [],
 			"energy": 2,
 			"yield": 0,
 			"yieldType": "",
+			"fixCost": [],
 			"colorize": [
 				{
 					x: 6,
@@ -240,14 +315,38 @@ module.exports = {
 			"category": "Actuator",
 			"description": "Claw-like legs. Facilitate latching and movement.",
 			"status": "Latched to surface but motor stuck!",
-			"error": true,
-			"level": 1,
+			"level": 0,
+			"upgradeable": true,
+			"upgradeSpec": [
+				{
+					"level": 1,
+					"costs": [
+						{
+							type: "NRG",
+							amount: 50
+						},
+						{
+							type: "MET",
+							amount: 150
+						},
+						{
+							type: "SIL",
+							amount: 90
+						}
+					],
+					"duration": 250,
+					"changes": {
+						"status": "Operational",
+						"actions": ["crawl", "push", "latch"],
+					}
+				}
+			],
 			"max": 1,
 			"current": 0,
 			"valueTerm": "",
 			"warningBelow": 0,
 			"warningAbove": 1,
-			"actions": ["crawl", "push", "latch"],
+			"actions": [],
 			"energy": 10,
 			"yield": 0,
 			"yieldType": "",
@@ -320,17 +419,19 @@ module.exports = {
 			"category": "Actuator",
 			"description": "Clamps on arms. May manipulate close-by objects and materials.",
 			"status": "Operational",
-			"error": false,
 			"level": 1,
+			"upgradeable": false,
+			"upgradeSpec": [],
 			"max": 1,
 			"current": 0,
 			"valueTerm": "",
 			"warningBelow": 0,
 			"warningAbove": 1,
-			"actions": ["harvest", "repair", "build"],
+			"actions": ["harvest", "fix", "build"],
 			"energy": 5,
 			"yield": 0,
 			"yieldType": "",
+			"fixCost": [],
 			"colorize": [
 				{
 					x: 6,
@@ -370,8 +471,9 @@ module.exports = {
 			"category": "Extractor",
 			"description": "Materials processing for silicon, extracting from rocks and debris.",
 			"status": "Operational",
-			"error": false,
 			"level": 1,
+			"upgradeable": false, // TODO : add upgrades later
+			"upgradeCost": [],
 			"max": 1,
 			"current": 0,
 			"valueTerm": "",
@@ -381,6 +483,7 @@ module.exports = {
 			"energy": 2,
 			"yield": 1,
 			"yieldType": "SIL",
+			"fixCost": [],
 			"colorize": [
 				{
 					x: 14,
@@ -395,8 +498,9 @@ module.exports = {
 			"category": "Extractor",
 			"description": "Materials processing for metals, extracting from rocks and debris.",
 			"status": "Operational",
-			"error": false,
 			"level": 1,
+			"upgradeable": false, // TODO : add upgrades later
+			"upgradeCost": [],
 			"max": 1,
 			"current": 0,
 			"valueTerm": "",
@@ -406,6 +510,7 @@ module.exports = {
 			"energy": 3,
 			"yield": 2,
 			"yieldType": "MET",
+			"fixCost": [],
 			"colorize": [
 				{
 					x: 6,
@@ -420,8 +525,54 @@ module.exports = {
 			"category": "Storage",
 			"description": "General purpose storage for materials.",
 			"status": "Operational",
-			"error": false,
 			"level": 1,
+			"upgradeable": true,
+			"upgradeSpec": [
+				{
+					"level": 2,
+					"costs": [
+						{
+							type: "NRG",
+							amount: 15
+						},
+						{
+							type: "MET",
+							amount: 10
+						},
+						{
+							type: "SIL",
+							amount: 5
+						}
+					],
+					"duration": 15,
+					"changes": {
+						"max": 80,
+						"warningAbove": 70
+					}
+				},
+				{
+					"level": 3,
+					"costs": [
+						{
+							type: "NRG",
+							amount: 30
+						},
+						{
+							type: "MET",
+							amount: 40
+						},
+						{
+							type: "SIL",
+							amount: 25
+						}
+					],
+					"duration": 25,
+					"changes": {
+						"max": 200,
+						"warningAbove": 180
+					}
+				}
+			],
 			"max": 40,
 			"current": 0,
 			"valueTerm": "Capacity",
@@ -431,6 +582,7 @@ module.exports = {
 			"energy": 0,
 			"yield": 0,
 			"yieldType": "",
+			"fixCost": [],
 			"colorize": [
 				{
 					x: 10,
@@ -444,14 +596,16 @@ module.exports = {
 				}
 			]
 		},
+		/*
 		{
 			"name": "Module factory",
 			"type": "tasks",
 			"category": "Factory",
 			"description": "A module which can build other modules.",
 			"status": "Operational",
-			"error": false,
 			"level": 1,
+			"upgradeable": true,
+			"upgradeSpec": [], //TODO
 			"max": 1,
 			"current": 0,
 			"valueTerm": "",
@@ -469,14 +623,60 @@ module.exports = {
 				}
 			]
 		},
+		 */
 		{
 			"name": "Solar panel",
 			"type": "perm",
 			"category": "Energy",
 			"description": "Energy harvesting from light energy.",
-			"status": "Panel damage!",
-			"error": false,
+			"status": "Major panel damage!",
 			"level": 1,
+			"upgradeable": true,
+			"upgradeSpec": [
+				{
+					"level": 2,
+					"costs": [
+						{
+							type: "NRG",
+							amount: 15
+						},
+						{
+							type: "MET",
+							amount: 20
+						},
+						{
+							type: "SIL",
+							amount: 10
+						}
+					],
+					"duration": 20,
+					"changes": {
+						"status": "Some panel damage",
+						"yield": 10
+					}
+				},
+				{
+					"level": 3,
+					"costs": [
+						{
+							type: "NRG",
+							amount: 50
+						},
+						{
+							type: "MET",
+							amount: 50
+						},
+						{
+							type: "SIL",
+							amount: 35
+						}
+					],
+					"changes": {
+						"status": "Operational",
+						"yield": 30
+					}
+				}
+			],
 			"max": 100,
 			"current": 5,
 			"valueTerm": "Energy output",
@@ -499,14 +699,62 @@ module.exports = {
 			"type": "perm",
 			"category": "Energy",
 			"description": "Energy storage for bot computer, sensors and actuators.",
-			"status": "Low capacity!",
-			"error": false,
+			"status": "Critically low capacity!",
 			"level": 1,
+			"upgradeable": true,
+			"upgradeSpec": [
+				{
+					"level": 2,
+					"costs": [
+						{
+							type: "NRG",
+							amount: 15
+						},
+						{
+							type: "MET",
+							amount: 5
+						},
+						{
+							type: "SIL",
+							amount: 30
+						}
+					],
+					"duration": 40,
+					"changes": {
+						"status": "Low capacity",
+						"max": 50,
+						"warningBelow": 20
+					}
+				},
+				{
+					"level": 3,
+					"costs": [
+						{
+							type: "NRG",
+							amount: 50
+						},
+						{
+							type: "MET",
+							amount: 15
+						},
+						{
+							type: "SIL",
+							amount: 50
+						}
+					],
+					"duration": 80,
+					"changes": {
+						"status": "Moderate capacity",
+						"max": 90,
+						"warningBelow": 30
+					}
+				}
+			],
 			"max": 20,
 			"current": 20,
 			"valueTerm": "Stored",
 			"warningBelow": 10,
-			"warningAbove": 100,
+			"warningAbove": 1000,
 			"actions": [],
 			"energy": 0,
 			"yield": 0,
@@ -525,8 +773,9 @@ module.exports = {
 			"category": "Energy",
 			"description": "Fuel storage for engines.",
 			"status": "Operational",
-			"error": false,
 			"level": 1,
+			"upgradeable": false, // TODO : make this upgradable later
+			"upgradeCost": [],
 			"max": 100,
 			"current": 0,
 			"valueTerm": "Stored",
@@ -550,14 +799,38 @@ module.exports = {
 			"category": "Engine",
 			"description": "Propulsion engine for slow, long journeys.",
 			"status": "Unknown damage!",
-			"error": true,
-			"level": 1,
+			"level": 0,
+			"upgradeable": true,
+			"upgradeSpec": [
+				{
+					"level": 1,
+					"costs": [
+						{
+							type: "NRG",
+							amount: 200
+						},
+						{
+							type: "MET",
+							amount: 400
+						},
+						{
+							type: "SIL",
+							amount: 250
+						}
+					],
+					"duration": 900,
+					"changes": {
+						"status": "Operational",
+						"actions": ["fly"],
+					}
+				}
+			],
 			"max": 1,
 			"current": 0,
 			"valueTerm": "Thrust",
 			"warningBelow": 0,
 			"warningAbove": 1,
-			"actions": ["fly"],
+			"actions": [],
 			"energy": 1000,
 			"yield": 0,
 			"yieldType": "",

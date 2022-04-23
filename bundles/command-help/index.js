@@ -26,9 +26,9 @@ module.exports = {
 
 		// list of disabled commands from the current player character
 		const disabledCommands = [];
-		character.modules.forEach(status => {
-			if (status.error) {
-				status.actions.forEach(action => disabledCommands.push(action))
+		character.modules.forEach(module => {
+			if (module.level === 0) {
+				module.actions.forEach(action => disabledCommands.push(action))
 			}
 		})
 		
@@ -106,12 +106,12 @@ module.exports = {
 			content = "";
 			content += chalk.bold(command.keywords[0]) + "\n";
 			if (command.keywords[1]) {
-				content += "Aliases: " + command.keywords.join(", ") + "\n";
+				content += chalk.white("Aliases: ") + command.keywords.join(", ") + "\n";
 			}
-			content += "Category: " + command.helpCategory + "\n";
-			content += "Syntax: " + command.helpSyntax.join(", ") + "\n";
+			content += chalk.white("Category: ") + command.helpCategory + "\n";
+			content += chalk.white("Syntax: ") + command.helpSyntax.join(", ") + "\n";
 			if (command.helpExample) {
-				content += "Example use: " + command.helpExample.join(", ") + "\n";
+				content += chalk.white("Example use: ") + command.helpExample.join(", ") + "\n";
 			}
 			content += "\n" + command.helpText + "\n";
 			socket.emit('output', { msg: content });

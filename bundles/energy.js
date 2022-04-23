@@ -9,9 +9,9 @@ module.exports = {
             const isTaskActive = character.tasks.find(task => { return task.moduleName === module.name }) !== undefined
             const permType = module.type === "perm"
 
-            if ((isTaskActive || permType) && !module.error && module.yieldType === "NRG") {
+            if ((isTaskActive || permType) && module.level > 0 && module.yieldType === "NRG") {
                 energy.netEnergy += module.yield
-            } else if ((isTaskActive || permType) && !module.error && module.energy > 0) {
+            } else if ((isTaskActive || permType) && module.level > 0 && module.energy > 0) {
                 energy.netEnergy -= module.energy
             }
         })

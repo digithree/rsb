@@ -1,4 +1,5 @@
 const chalk = require("chalk");
+const Table = require("cli-table");
 const server = require.main.require('./bundles/server.js');
 const energy = require.main.require('./bundles/energy.js');
 const storage = require.main.require("./bundles/storage.js");
@@ -7,12 +8,10 @@ module.exports = {
     "TIME_UNIT": 1000, // 1 sec
     "TIME_UNIT_READABLE": "sec", // 1 sec
 
-    createTask : function (name, level, bundle, moduleName, duration, costs, output, payload = {}) {
+    createTask : function (name, bundle, duration, costs, output, payload = {}) {
         return {
             "name": name,
-            "level": level,
             "bundle": bundle,
-            "moduleName": moduleName,
             "startTime": (new Date()).getTime(),
             "duration": duration,
             "costs": costs,
@@ -22,6 +21,23 @@ module.exports = {
         }
     },
 
+    printCosts : function (title, costs, socket) {
+        let output = title + ":\n"
+        const table = new Table({
+            head: [
+                chalk.whiteBright.bold("AMT"),
+                chalk.whiteBright.bold("TYPE"),
+            ],
+            colWidths: [6, 6],
+            chars: {'mid': '', 'left-mid': '', 'mid-mid': '', 'right-mid': ''}
+        });
+        costs.forEach(cost => {
+            table.push([chalk.white(cost.type), chalk.yellowBright(cost.amount)])
+        })
+        output += table.toString()
+        socket.emit('output', {msg: output })
+    },
+
     addTask : function (task, character, socket) {
         const memoryBytes = character.modules.find(el => { return el.name === "Memory"}).current
 
@@ -29,10 +45,13 @@ module.exports = {
         const batteryModule = character.modules.find(el => { return el.name === "Battery"})
         const storageModule = character.modules.find(el => { return el.name === "Storage"})
 
+        this.printCosts("Task costs", task.costs, socket)
+
         let result = {
             added: true,
             msg: chalk.green("Task \"" + task.name + "\" added to queue")
         }
+        let failedResultText = ""
 
         //validate costs
         let costAfforded = true
@@ -45,11 +64,9 @@ module.exports = {
                 const batteryRemaining = batteryModule.current + energyDiff
                 if (batteryRemaining < 0) {
                     costAfforded = false
-                    result = {
-                        added: false,
-                        msg: chalk.red("Task \"" + task.name + "\" could NOT be queued, not enough NRG (need "
-                            + (batteryRemaining * -1) + ")")
-                    }
+                    failedResultText += chalk.red(
+                        "\n\t- not enough NRG (need " + (batteryRemaining * -1) + ")"
+                    )
                 }
             } else {
                 // in Storage
@@ -57,18 +74,14 @@ module.exports = {
 
                 if (materialStored === undefined) {
                     costAfforded = false
-                    result = {
-                        added: false,
-                        msg: chalk.red("Task \"" + task.name + "\" could NOT be queued, not enough " + item.type
-                            + " (need " + item.amount + ")")
-                    }
+                    failedResultText += chalk.red(
+                        "\n\t- not enough " + item.type + " (need " + item.amount + ")"
+                    )
                 } else if (materialStored.amount - item.amount < 0) {
                     costAfforded = false
-                    result = {
-                        added: false,
-                        msg: chalk.red("Task \"" + task.name + "\" could NOT be queued, not enough " + item.type
-                            + " (need " + ((materialStored.amount - item.amount) * -1) + ")")
-                    }
+                    failedResultText += chalk.red(
+                        "\n- not enough " + item.type + " (need " + ((materialStored.amount - item.amount) * -1) + ")"
+                    )
                 }
             }
         })
@@ -82,11 +95,9 @@ module.exports = {
                     // adding to battery
                     if (batteryModule.current === batteryModule.max) {
                         hasStorageSpace = false
-                        result = {
-                            added: false,
-                            msg: chalk.red("Task \"" + task.name + "\" could NOT be queued, battery does not need NRG,"
-                                + "is full")
-                        }
+                        failedResultText += chalk.red(
+                            "\n- battery does not need NRG," + "is full"
+                        )
                     }
                 } else {
                     // in Storage
@@ -94,12 +105,9 @@ module.exports = {
 
                     if (storageTracking > storageModule.max) {
                         hasStorageSpace = false
-                        result = {
-                            added: false,
-                            msg: chalk.red("Task \"" + task.name
-                                + "\" could NOT be queued, not enough storage space for "
-                                + item.amount + " " + item.type)
-                        }
+                        failedResultText += chalk.red(
+                            "\n- not enough storage space for " + item.amount + " " + item.type
+                        )
                     }
                 }
             })
@@ -112,6 +120,11 @@ module.exports = {
                     added: false,
                     msg: chalk.red("Task \"" + task.name + "\" could NOT be queued, not enough memory!")
                 }
+            }
+        } else {
+            result = {
+                added: false,
+                msg: chalk.redBright("Task \"" + task.name + "\" could NOT be queued:") + failedResultText
             }
         }
 

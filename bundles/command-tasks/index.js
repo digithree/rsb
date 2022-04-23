@@ -26,6 +26,8 @@ module.exports = {
 
 		const completedTasks = tasks.completedTasksCount(character)
 
+		arguments = arguments.toLowerCase();
+
 		if (arguments === undefined || arguments === null || arguments === "") {
 			if (character.tasks.length === 0) {
 				socket.emit('output', { msg: chalk.yellow("No tasks currently queued") })

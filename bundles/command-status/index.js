@@ -24,7 +24,7 @@ function moduleColor(module, character) {
 	const permType = module.type === "perm"
 
 	let col = colors.cyan;
-	if (module.error) {
+	if (module.level === 0) {
 		col = colors.red
 	} else if (module.current < module.warningBelow || module.current > module.warningAbove) {
 		col = colors.orange
@@ -127,9 +127,9 @@ module.exports = {
 				const permType = module.type === "perm"
 
 				let energyUsage = padGrayDots("" + module.energy, costPadWidth, chalk.gray)
-				if ((isTaskActive || permType) && !module.error && module.energy > 0) {
+				if ((isTaskActive || permType) && module.level > 0 && module.energy > 0) {
 					energyUsage = padGrayDots("" + module.energy, costPadWidth, chalk.yellowBright)
-				} else if ((isTaskActive || permType) && !module.error && module.energy < 0) {
+				} else if ((isTaskActive || permType) && module.level > 0 && module.energy < 0) {
 					energyUsage = padGrayDots("" + module.energy, costPadWidth, chalk.greenBright)
 				} else if (module.energy === 0) {
 					energyUsage = padGrayDots("", costPadWidth)
@@ -140,7 +140,7 @@ module.exports = {
 					activeText = chalk.green("PERM")
 				} else if (isTaskActive) {
 					activeText = chalk.hex(colors.magenta)("TASK")
-				} else if (!module.error) {
+				} else if (module.level > 0) {
 					activeText = chalk.hex(colors.cyan)("IDLE")
 				}
 
@@ -148,7 +148,7 @@ module.exports = {
 					[
 						padGrayDots(module.name, namePadWidth, colText),
 						energyUsage,
-						((isTaskActive || permType) && !module.error && module.yieldType !== ""
+						((isTaskActive || permType) && module.level > 0 && module.yieldType !== ""
 								? chalk.greenBright(module.yield + " " + module.yieldType)
 								: chalk.gray(module.yield + " " + module.yieldType) //padGrayDots("", yieldsPadWidth)
 						),
@@ -164,7 +164,7 @@ module.exports = {
 				with: botBox,
 				where: {
 					x: 53,
-					y: 1
+					y: 0
 				}
 			}) + "\n"
 
@@ -256,7 +256,8 @@ module.exports = {
 					[padGrayDots("Type", namePadWidth, chalk.white), module.type.toUpperCase()],
 					[padGrayDots("Description", namePadWidth, chalk.white), wrap(module.description, maxLine)],
 					[padGrayDots("Status", namePadWidth, chalk.white), colText(wrap(module.status, maxLine))],
-					[padGrayDots("Error?", namePadWidth, chalk.white), (module.error ? chalk.redBright('ERROR') : chalk.gray('None'))],
+					[padGrayDots("Level", namePadWidth, chalk.white), colText(wrap("" + module.level, maxLine))],
+					[padGrayDots("Error?", namePadWidth, chalk.white), (module.level === 0 ? chalk.redBright('ERROR') : chalk.gray('None'))],
 					[padGrayDots("Warning?", namePadWidth, chalk.white), (warning ? chalk.hex(colors.orange)(wrap(warningText, maxLine)) : chalk.gray('None'))],
 					[padGrayDots("Activity", namePadWidth, chalk.white), activity],
 				)

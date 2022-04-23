@@ -173,9 +173,9 @@ module.exports = {
 
 		// list of disabled commands from the current player character
 		const disabledCommands = [];
-		character.modules.forEach(status => {
-			if (status.error) {
-				status.actions.forEach(action => disabledCommands.push(action))
+		character.modules.forEach(module => {
+			if (module.level === 0) {
+				module.actions.forEach(action => disabledCommands.push(action))
 			}
 		})
 

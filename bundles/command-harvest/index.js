@@ -27,12 +27,9 @@ module.exports = {
 			return;
 		}
 
-		// TODO : add task details for harvest task
 		const task = tasks.createTask(
 			"Harvesting materials",
-			armsModule.level,
 			"command-harvest",
-			armsModule.name,
 			10,
 			[
 				{
@@ -48,10 +45,7 @@ module.exports = {
 			]
 		)
 
-		const result = tasks.addTask(
-			task, character, socket
-		)
-		// ignore result
+		tasks.addTask(task, character, socket)
 	},
 
 	runTask : function (task, character, socket) {
