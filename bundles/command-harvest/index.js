@@ -1,6 +1,5 @@
 const chalk = require("chalk");
 const tasks = require.main.require("./bundles/tasks.js");
-const storage = require.main.require("./bundles/storage.js");
 const server = require.main.require('./bundles/server.js');
 
 module.exports = {
@@ -41,14 +40,12 @@ module.exports = {
 					"type": "NRG"
 				}
 			],
-			{
-				"output": [
-					{
-						"amount": 20,
-						"type": "RAW"
-					}
-				]
-			}
+			[
+				{
+					"amount": 20,
+					"type": "RAW"
+				}
+			]
 		)
 
 		const result = tasks.addTask(
@@ -58,6 +55,6 @@ module.exports = {
 	},
 
 	runTask : function (task, character, socket) {
-		storage.storeMaterials(task.payload.output, character, socket)
+		// nothing particular to do, but this function must exist
 	}
 }

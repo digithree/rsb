@@ -25,8 +25,8 @@ module.exports = {
 		
 		// Start parsing commands
 		socket.on('input', function (data) {
-			tasks.processTasks(socket.character, socket)
 			this.runCommand(data.msg, socket.character);
+			tasks.processTasks(socket.character, socket)
 		}.bind(this));
 		
 		// Listener for when user disconnects

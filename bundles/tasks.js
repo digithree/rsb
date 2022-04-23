@@ -1,12 +1,13 @@
 const chalk = require("chalk");
 const server = require.main.require('./bundles/server.js');
 const energy = require.main.require('./bundles/energy.js');
+const storage = require.main.require("./bundles/storage.js");
 
 module.exports = {
     "TIME_UNIT": 1000, // 1 sec
     "TIME_UNIT_READABLE": "sec", // 1 sec
 
-    createTask : function (name, level, bundle, moduleName, duration, costs, payload) {
+    createTask : function (name, level, bundle, moduleName, duration, costs, output, payload = {}) {
         return {
             "name": name,
             "level": level,
@@ -15,6 +16,7 @@ module.exports = {
             "startTime": (new Date()).getTime(),
             "duration": duration,
             "costs": costs,
+            "output": output,
             "payload": payload,
             "complete": false
         }
@@ -108,7 +110,6 @@ module.exports = {
             storageModule.current -= storageNetReduce
             // add task to queue
             character.tasks.push(task)
-            this.processTasks(character, socket, task.startTime)
         }
         return result.added
     },
@@ -131,6 +132,10 @@ module.exports = {
                 });
             } else {
                 socket.emit('output', { msg: chalk.green("[task " + task.name + " is complete!]") })
+                // then store materials, if any
+                if (task.output.length > 0) {
+                    storage.storeMaterials(task.output, character, socket)
+                }
                 server.bundles[task.bundle].runTask(task, character, socket)
                 task.complete = true
             }
