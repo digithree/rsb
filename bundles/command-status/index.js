@@ -79,7 +79,7 @@ module.exports = {
 		const command = {
 			"keywords": ["status", "s"],
 			"run": this.runCommand,
-			"helpCategory": "Information",
+			"helpCategory": "Management",
 			"helpSyntax": ["status", "status <area>"],
 			"helpText": "Display the current bot status.",
 			"enabled": true

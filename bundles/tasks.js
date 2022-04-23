@@ -144,6 +144,19 @@ module.exports = {
         return result.added
     },
 
+    completedTasksCount : function (character, currentTime = (new Date()).getTime()) {
+        let count = 0
+        for (let taskIndex = 0; taskIndex < character.tasks.length; taskIndex++) {
+            const task = character.tasks[taskIndex]
+            const leftOverTime = currentTime - task.startTime
+            const taskDuration = (task.duration * this.TIME_UNIT)
+            if (leftOverTime - taskDuration >= 0) {
+                count++
+            }
+        }
+        return count
+    },
+
     processTasks : function (character, socket, currentTime = (new Date()).getTime()) {
         if (character.tasks.length > 0) {
             socket.emit('output', { msg: chalk.blue("-".repeat(5) + "TASKS QUEUE" + "-".repeat(40)) })
