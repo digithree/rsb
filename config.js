@@ -1,11 +1,16 @@
 const chalk = require("chalk");
+const fs = require('fs');
+
+const titleGraphic = fs.readFileSync('./ascii-img/title.txt').toString()
 
 module.exports = {
 	// name of this project
 	name: 'RSB',
 
 	// welcome message to be displayed when the user first connects to the MUD
-	welcomeMessage: chalk.yellow("-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-\n\n")
+	welcomeMessage: chalk.blue("-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-\n\n")
+		+ chalk.yellow(titleGraphic) + "\n\n"
+		+ chalk.blue("-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-\n\n")
 		+ "You have logged into the " + chalk.cyanBright("Remote SpaceBot") + " controller tool.",
 
 	// if true, will show general server info on welcome screen
