@@ -65,6 +65,7 @@ module.exports = {
 		"command-status",
 		"command-harvest",
 		"command-fix",
+		"command-upgrade",
 	],
 
 	// initial bundle to run

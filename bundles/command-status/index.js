@@ -250,13 +250,44 @@ module.exports = {
 					}
 				}
 
+				let upgradeTitle = "Upgradable?"
+				let upgradeText = ""
+				if (!module.upgradeable) {
+					upgradeText = chalk.yellow("No")
+				} else if (module.level === 0) {
+					upgradeTitle = "Fixable?"
+					const upgradeSpecItem = module.upgradeSpec.find(spec => { return spec.level === 1 })
+					if (upgradeSpecItem === undefined) {
+						upgradeText = chalk.red('SOFTWARE ERROR')
+					} else {
+						upgradeText = "Fix costs:\n" + tasks.getCostsTable(upgradeSpecItem.costs)
+					}
+				} else {
+					const upgradeSpecItem = module.upgradeSpec.find(spec => { return spec.level === (module.level + 1) })
+					if (upgradeSpecItem === undefined) {
+						upgradeText = chalk.yellow('At max level')
+					} else {
+						upgradeText = "Level " + (module.level + 1) + " costs:\n" + tasks.getCostsTable(upgradeSpecItem.costs)
+					}
+				}
+
 				table.push(
 					[padGrayDots("Name", namePadWidth, chalk.white), chalk.bold(wrap(module.name, maxLine))],
 					[padGrayDots("Category", namePadWidth, chalk.white), module.category],
 					[padGrayDots("Type", namePadWidth, chalk.white), module.type.toUpperCase()],
 					[padGrayDots("Description", namePadWidth, chalk.white), wrap(module.description, maxLine)],
-					[padGrayDots("Status", namePadWidth, chalk.white), colText(wrap(module.status, maxLine))],
-					[padGrayDots("Level", namePadWidth, chalk.white), colText(wrap("" + module.level, maxLine))],
+					[padGrayDots("Status", namePadWidth, chalk.white), colText(wrap(module.status, maxLine))]
+				)
+				if (module.upgradeable && module.level > 0) {
+					table.push(
+						[
+							padGrayDots("Level", namePadWidth, chalk.white),
+							colText(wrap("" + module.level, maxLine))
+						]
+					)
+				}
+				table.push(
+					[padGrayDots(upgradeTitle, namePadWidth, chalk.white), upgradeText],
 					[padGrayDots("Error?", namePadWidth, chalk.white), (module.level === 0 ? chalk.redBright('ERROR') : chalk.gray('None'))],
 					[padGrayDots("Warning?", namePadWidth, chalk.white), (warning ? chalk.hex(colors.orange)(wrap(warningText, maxLine)) : chalk.gray('None'))],
 					[padGrayDots("Activity", namePadWidth, chalk.white), activity],

@@ -427,7 +427,7 @@ module.exports = {
 			"valueTerm": "",
 			"warningBelow": 0,
 			"warningAbove": 1,
-			"actions": ["harvest", "fix", "build"],
+			"actions": ["harvest", "fix", "upgrade"],
 			"energy": 5,
 			"yield": 0,
 			"yieldType": "",

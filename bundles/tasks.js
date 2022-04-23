@@ -8,9 +8,10 @@ module.exports = {
     "TIME_UNIT": 1000, // 1 sec
     "TIME_UNIT_READABLE": "sec", // 1 sec
 
-    createTask : function (name, bundle, duration, costs, output, payload = {}) {
+    createTask : function (name, moduleName, bundle, duration, costs, output, payload = {}) {
         return {
             "name": name,
+            "moduleName": moduleName,
             "bundle": bundle,
             "startTime": (new Date()).getTime(),
             "duration": duration,
@@ -23,6 +24,11 @@ module.exports = {
 
     printCosts : function (title, costs, socket) {
         let output = title + ":\n"
+        output += this.getCostsTable(costs).toString()
+        socket.emit('output', {msg: output })
+    },
+
+    getCostsTable : function (costs) {
         const table = new Table({
             head: [
                 chalk.whiteBright.bold("AMT"),
@@ -34,8 +40,7 @@ module.exports = {
         costs.forEach(cost => {
             table.push([chalk.white(cost.type), chalk.yellowBright(cost.amount)])
         })
-        output += table.toString()
-        socket.emit('output', {msg: output })
+        return table.toString()
     },
 
     addTask : function (task, character, socket) {
@@ -124,7 +129,7 @@ module.exports = {
         } else {
             result = {
                 added: false,
-                msg: chalk.redBright("Task \"" + task.name + "\" could NOT be queued:") + failedResultText
+                msg: chalk.whiteBright("Task \"" + task.name + "\" could NOT be queued:") + failedResultText
             }
         }
 

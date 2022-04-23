@@ -8,7 +8,7 @@ module.exports = {
 		const command = {
 			"keywords": ["harvest", "v"],
 			"run": this.runCommand,
-			"helpCategory": "Factory",
+			"helpCategory": "Environment",
 			"helpSyntax": ["harvest"],
 			"helpText": "Harvest material from the current location."
 		};
@@ -29,6 +29,7 @@ module.exports = {
 
 		const task = tasks.createTask(
 			"Harvesting materials",
+			"Arms",
 			"command-harvest",
 			10,
 			[
