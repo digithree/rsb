@@ -31,7 +31,7 @@ module.exports = {
 
         let result = {
             added: true,
-            msg: chalk.green("Task \"" + task.name + "\" started")
+            msg: chalk.green("Task \"" + task.name + "\" added to queue")
         }
 
         //validate costs
@@ -47,7 +47,7 @@ module.exports = {
                     costAfforded = false
                     result = {
                         added: false,
-                        msg: chalk.red("Task \"" + task.name + "\" could NOT be started, not enough NRG (need "
+                        msg: chalk.red("Task \"" + task.name + "\" could NOT be queued, not enough NRG (need "
                             + (batteryRemaining * -1) + ")")
                     }
                 }
@@ -59,59 +59,58 @@ module.exports = {
                     costAfforded = false
                     result = {
                         added: false,
-                        msg: chalk.red("Task \"" + task.name + "\" could NOT be started, not enough " + item.type
+                        msg: chalk.red("Task \"" + task.name + "\" could NOT be queued, not enough " + item.type
                             + " (need " + item.amount + ")")
                     }
                 } else if (materialStored.amount - item.amount < 0) {
                     costAfforded = false
                     result = {
                         added: false,
-                        msg: chalk.red("Task \"" + task.name + "\" could NOT be started, not enough " + item.type
+                        msg: chalk.red("Task \"" + task.name + "\" could NOT be queued, not enough " + item.type
                             + " (need " + ((materialStored.amount - item.amount) * -1) + ")")
                     }
                 }
             }
         })
 
-        // check enough room to store any gathered or processed materials
+        // check enough room to store any gathered or processed materials, only if there are no additional tasks queued
         let hasStorageSpace = true
-        let storageTracking = storageModule.current
-        task.output.forEach(item => {
-            if (item.type === "NRG") {
-                // adding to battery
-                if (batteryModule.current === batteryModule.max) {
-                    hasStorageSpace = false
-                    result = {
-                        added: false,
-                        msg: chalk.red("Task \"" + task.name + "\" could NOT be started, battery does not need NRG, is full")
+        if (character.tasks.length === 0) {
+            let storageTracking = storageModule.current
+            task.output.forEach(item => {
+                if (item.type === "NRG") {
+                    // adding to battery
+                    if (batteryModule.current === batteryModule.max) {
+                        hasStorageSpace = false
+                        result = {
+                            added: false,
+                            msg: chalk.red("Task \"" + task.name + "\" could NOT be queued, battery does not need NRG,"
+                                + "is full")
+                        }
                     }
-                }
-            } else {
-                // in Storage
-                storageTracking += item.amount
+                } else {
+                    // in Storage
+                    storageTracking += item.amount
 
-                if (storageTracking > storageModule.max) {
-                    hasStorageSpace = false
-                    result = {
-                        added: false,
-                        msg: chalk.red("Task \"" + task.name + "\" could NOT be started, not enough storage space for "
-                            + item.amount + " " + item.type)
+                    if (storageTracking > storageModule.max) {
+                        hasStorageSpace = false
+                        result = {
+                            added: false,
+                            msg: chalk.red("Task \"" + task.name
+                                + "\" could NOT be queued, not enough storage space for "
+                                + item.amount + " " + item.type)
+                        }
                     }
                 }
-            }
-        })
+            })
+        }
 
         if (costAfforded && hasStorageSpace) {
             const maxTasks = (Math.floor(Math.log(memoryBytes) / Math.log(2))) - 6
             if (character.tasks.length >= maxTasks) {
                 result = {
                     added: false,
-                    msg: chalk.red("Task \"" + task.name + "\" could NOT be started, not enough memory!")
-                }
-            } else if (character.tasks.find(el => { return el.name === task.name}) !== undefined) {
-                result = {
-                    added: false,
-                    msg: chalk.red("Task \"" + task.name + "\" could NOT be started, this task already active!")
+                    msg: chalk.red("Task \"" + task.name + "\" could NOT be queued, not enough memory!")
                 }
             }
         }
@@ -134,6 +133,11 @@ module.exports = {
                 }
             })
             storageModule.current -= storageNetReduce
+            // adjust start time if will be queued
+            if (character.tasks.length > 0) {
+                const lastTask = character.tasks[character.tasks.length - 1]
+                task.startTime = lastTask.startTime + (lastTask.duration * this.TIME_UNIT)
+            }
             // add task to queue
             character.tasks.push(task)
         }
@@ -141,30 +145,46 @@ module.exports = {
     },
 
     processTasks : function (character, socket, currentTime = (new Date()).getTime()) {
-        const hasTasks = character.tasks.length > 0
-        if (hasTasks) {
-            socket.emit('output', { msg: chalk.blue("-".repeat(5) + "TASKS REMINDERS" + "-".repeat(40)) })
-        }
-        character.tasks.forEach(task => {
-            const timeLeft = (task.startTime + (task.duration * this.TIME_UNIT)) - currentTime
-            if (timeLeft > 0) {
-                const timeLeftReadable = timeLeft === 0 ? 0 : (timeLeft / 1000).toFixed(2)
-                socket.emit('output', { msg:
-                        chalk.blue(
-                            "[time left on task " + task.name + " is "
+        if (character.tasks.length > 0) {
+            socket.emit('output', { msg: chalk.blue("-".repeat(5) + "TASKS QUEUE" + "-".repeat(40)) })
+            let output = ""
+            for (let taskIndex = 0; taskIndex < character.tasks.length; taskIndex++) {
+                const task = character.tasks[taskIndex]
+                const leftOverTime = currentTime - task.startTime
+                const taskDuration = (task.duration * this.TIME_UNIT)
+                if (leftOverTime - taskDuration >= 0) {
+                    // task is complete
+                    output += chalk.green("\n[task " + task.name + " is complete]")
+                    // then store materials, if any
+                    if (task.output.length > 0) {
+                        storage.storeMaterials(task.output, character, socket)
+                    }
+                    // run specific task function
+                    server.bundles[task.bundle].runTask(task, character, socket)
+                    task.complete = true
+                } else {
+                    // not enough time for task
+                    let isFirstNotCompleteTask = true
+                    for (let i = 0; i < taskIndex; i++) {
+                        if (!character.tasks[i].complete) {
+                            isFirstNotCompleteTask = false
+                            break
+                        }
+                    }
+                    if (isFirstNotCompleteTask) {
+                        const timeLeft = (leftOverTime - taskDuration) * -1
+                        const timeLeftReadable = timeLeft === 0 ? 0 : (timeLeft / 1000).toFixed(2)
+                        output += chalk.blue(
+                            "\n[time left on task " + task.name + " is "
                             + timeLeftReadable + " " + this.TIME_UNIT_READABLE + "]"
                         )
-                });
-            } else {
-                socket.emit('output', { msg: chalk.green("[task " + task.name + " is complete!]") })
-                // then store materials, if any
-                if (task.output.length > 0) {
-                    storage.storeMaterials(task.output, character, socket)
+                    } else {
+                        output += chalk.gray("\n[queued task " + task.name + "]")
+                    }
                 }
-                server.bundles[task.bundle].runTask(task, character, socket)
-                task.complete = true
             }
-        })
-        character.tasks = character.tasks.filter(task => { return task.complete === false })
+            socket.emit('output', { msg: output })
+            character.tasks = character.tasks.filter(task => { return task.complete === false })
+        }
     },
 }
