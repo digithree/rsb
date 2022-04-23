@@ -140,9 +140,6 @@ module.exports = {
                 task.complete = true
             }
         })
-        if (hasTasks) {
-            socket.emit('output', { msg: chalk.blue("-".repeat(60)) })
-        }
         character.tasks = character.tasks.filter(task => { return task.complete === false })
     },
 }

@@ -33,7 +33,7 @@ $(function() {
             } else {
                 // Normal command
                 terminalOutput({
-                    msg: '> ' + message
+                    msg: '> ' + message + "\n"
                 });
             }
 
@@ -45,7 +45,7 @@ $(function() {
 
     // add output to terminal
     function terminalOutput (data) {
-        term.write(data.msg + "\n")
+        term.write(data.msg)
     }
 
     // prevents input from having injected markup
