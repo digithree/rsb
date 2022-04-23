@@ -37,7 +37,6 @@ module.exports = {
         //validate costs
         let costAfforded = true
         task.costs.forEach(item => {
-            if (!costAfforded) return
             if (item.type === "NRG") {
                 // use battery
                 const energyStats = energy.energyStats(character)
@@ -73,9 +72,36 @@ module.exports = {
                 }
             }
         })
-        // TODO : check enough room to store any gathered or processed materials
 
-        if (costAfforded) {
+        // check enough room to store any gathered or processed materials
+        let hasStorageSpace = true
+        let storageTracking = storageModule.current
+        task.output.forEach(item => {
+            if (item.type === "NRG") {
+                // adding to battery
+                if (batteryModule.current === batteryModule.max) {
+                    hasStorageSpace = false
+                    result = {
+                        added: false,
+                        msg: chalk.red("Task \"" + task.name + "\" could NOT be started, battery does not need NRG, is full")
+                    }
+                }
+            } else {
+                // in Storage
+                storageTracking += item.amount
+
+                if (storageTracking > storageModule.max) {
+                    hasStorageSpace = false
+                    result = {
+                        added: false,
+                        msg: chalk.red("Task \"" + task.name + "\" could NOT be started, not enough storage space for "
+                            + item.amount + " " + item.type)
+                    }
+                }
+            }
+        })
+
+        if (costAfforded && hasStorageSpace) {
             const maxTasks = (Math.floor(Math.log(memoryBytes) / Math.log(2))) - 6
             if (character.tasks.length >= maxTasks) {
                 result = {
@@ -120,7 +146,6 @@ module.exports = {
             socket.emit('output', { msg: chalk.blue("-".repeat(5) + "TASKS REMINDERS" + "-".repeat(40)) })
         }
         character.tasks.forEach(task => {
-            // TODO : calculate duration for expiry
             const timeLeft = (task.startTime + (task.duration * this.TIME_UNIT)) - currentTime
             if (timeLeft > 0) {
                 const timeLeftReadable = timeLeft === 0 ? 0 : (timeLeft / 1000).toFixed(2)
