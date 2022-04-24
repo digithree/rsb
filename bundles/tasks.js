@@ -176,6 +176,7 @@ module.exports = {
     },
 
     processTasks : function (character, socket, currentTime = (new Date()).getTime()) {
+        if (character === null) return // character not set up yet
         if (character.tasks.length > 0) {
             socket.emit('output', { msg: chalk.blue("-".repeat(5) + "TASKS QUEUE" + "-".repeat(40)) })
             let output = ""
