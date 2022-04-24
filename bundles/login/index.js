@@ -41,11 +41,11 @@ module.exports = {
 			// account doesn't exist, so create a new one.
 			socket.emit('output', {
 				msg: "Are you sure this is the right e-mail: "
-					+ chalk.bgBlue.black(email)
+					+ chalk.blueBright(email)
 					+ "?\nType "
-					+ chalk.bgWhite.black('yes')
+					+ chalk.greenBright('yes')
 					+ " or "
-					+ chalk.bgWhite.black('no')
+					+ chalk.redBright('no')
 			});
 			
 			socket.once('input', function (data) {
