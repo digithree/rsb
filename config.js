@@ -64,6 +64,7 @@ module.exports = {
 		"command-tasks",
 		"command-status",
 		"command-harvest",
+		"command-dump",
 		"command-fix",
 		"command-upgrade",
 	],
