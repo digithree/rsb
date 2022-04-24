@@ -164,7 +164,7 @@ module.exports = {
 			output += "\nResources:\n\n"
 
 			table = new Table({
-				colWidths: [20, 10],
+				colWidths: [20, 17],
 				chars: {'mid': '', 'left-mid': '', 'mid-mid': '', 'right-mid': ''}
 			});
 
@@ -198,7 +198,11 @@ module.exports = {
 			}
 			colText = chalk.hex(col)
 			table.push(
-				[utils.padGrayDots("Storage", namePadWidth, chalk.white), colText(storageModule.current + " / " + storageModule.max)]
+				[
+					utils.padGrayDots("Storage", namePadWidth, chalk.white),
+					colText(storageModule.current + " / " + storageModule.max) + "\n" +
+						tasks.getCostsTable(character.storage)
+				]
 			)
 
 			output += table.toString() + "\n"
@@ -300,14 +304,7 @@ module.exports = {
 				if (module.name === "Storage") {
 					let storageText = ""
 					if (character.storage.length > 0) {
-						let first = true
-						character.storage.forEach(item => {
-							if (!first) {
-								storageText += "\n"
-							}
-							first = false
-							storageText += "" + item.amount + " " + item.type
-						})
+						storageText = tasks.getCostsTable(character.storage)
 					} else {
 						storageText = chalk.gray("None")
 					}
