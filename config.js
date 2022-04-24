@@ -65,6 +65,8 @@ module.exports = {
 		"command-status",
 		"command-harvest",
 		"command-dump",
+		"command-refine-sil",
+		"command-refine-met",
 		"command-fix",
 		"command-upgrade",
 	],

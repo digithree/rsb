@@ -302,7 +302,6 @@ module.exports = {
 			"energy": 2,
 			"yield": 0,
 			"yieldType": "",
-			"fixCost": [],
 			"colorize": [
 				{
 					x: 6,
@@ -436,14 +435,14 @@ module.exports = {
 					"showCosts": true,
 					"costs": [
 						{
-							"amount": 5,
+							"amount": 3,
 							"type": "NRG"
 						}
 					],
-					"duration": 10,
+					"duration": 6,
 					"output": [
 						{
-							"amount": 20,
+							"amount": 10,
 							"type": "RAW"
 						}
 					]
@@ -463,10 +462,9 @@ module.exports = {
 					"output": []
 				}
 			],
-			"energy": 5,
-			"yield": 0,
-			"yieldType": "",
-			"fixCost": [],
+			"energy": 3,
+			"yield": 10,
+			"yieldType": "RAW",
 			"colorize": [
 				{
 					x: 6,
@@ -501,10 +499,10 @@ module.exports = {
 			]
 		},
 		{
-			"name": "Silicon extractor",
+			"name": "Silicon refinery",
 			"type": "tasks",
-			"category": "Extractor",
-			"description": "Materials processing for silicon, extracting from rocks and debris.",
+			"category": "Refinery",
+			"description": "Refines silicon (SIL) from raw materials (RAW).",
 			"status": "Operational",
 			"level": 1,
 			"upgradeable": false, // TODO : add upgrades later
@@ -514,11 +512,32 @@ module.exports = {
 			"valueTerm": "",
 			"warningBelow": 0,
 			"warningAbove": 1,
-			"actions": [],
-			"energy": 2,
-			"yield": 1,
+			"actions": [
+				{
+					"name": "refine-sil",
+					"showCosts": true,
+					"costs": [
+						{
+							"amount": 4,
+							"type": "NRG"
+						},
+						{
+							"amount": 5,
+							"type": "RAW"
+						}
+					],
+					"duration": 15,
+					"output": [
+						{
+							"amount": 2,
+							"type": "SIL"
+						}
+					]
+				},
+			],
+			"energy": 4,
+			"yield": 2,
 			"yieldType": "SIL",
-			"fixCost": [],
 			"colorize": [
 				{
 					x: 14,
@@ -528,10 +547,10 @@ module.exports = {
 			]
 		},
 		{
-			"name": "Metals extractor",
+			"name": "Metals refinery",
 			"type": "tasks",
-			"category": "Extractor",
-			"description": "Materials processing for metals, extracting from rocks and debris.",
+			"category": "Refinery",
+			"description": "Refines metal (MET) from raw materials (RAW).",
 			"status": "Operational",
 			"level": 1,
 			"upgradeable": false, // TODO : add upgrades later
@@ -541,11 +560,32 @@ module.exports = {
 			"valueTerm": "",
 			"warningBelow": 0,
 			"warningAbove": 1,
-			"actions": [],
-			"energy": 3,
-			"yield": 2,
+			"actions": [
+				{
+					"name": "refine-met",
+					"showCosts": true,
+					"costs": [
+						{
+							"amount": 5,
+							"type": "NRG"
+						},
+						{
+							"amount": 5,
+							"type": "RAW"
+						}
+					],
+					"duration": 10,
+					"output": [
+						{
+							"amount": 4,
+							"type": "MET"
+						}
+					]
+				},
+			],
+			"energy": 5,
+			"yield": 4,
 			"yieldType": "MET",
-			"fixCost": [],
 			"colorize": [
 				{
 					x: 6,
@@ -630,7 +670,6 @@ module.exports = {
 			"energy": 0,
 			"yield": 0,
 			"yieldType": "",
-			"fixCost": [],
 			"colorize": [
 				{
 					x: 10,

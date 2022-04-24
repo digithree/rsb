@@ -6,11 +6,11 @@ module.exports = {
 	// called when bundle is loaded
 	init : function () {
 		const command = {
-			"keywords": ["harvest", "v"],
+			"keywords": ["refine-sil", "rs"],
 			"run": this.runCommand,
-			"helpCategory": "Environment",
-			"helpSyntax": ["harvest"],
-			"helpText": "Harvest material from the current location."
+			"helpCategory": "Refinery",
+			"helpSyntax": ["refine-sil"],
+			"helpText": "Refines silicon (SIL) from raw materials (RAW)."
 		};
 		
 		server.commands.push(command);
@@ -20,24 +20,24 @@ module.exports = {
 		// Command can only be used by player-controlled characters (not NPC:s)
 		if (!socket) { return; }
 
-		const module = character.modules.find(module => { return module.name === "Arms" })
+		const module = character.modules.find(module => { return module.name === "Silicon refinery" })
 
 		if (module === undefined) {
-			socket.emit('output', { msg: chalk.red("Arms module could not be found, software error!") });
+			socket.emit('output', { msg: chalk.red("Silicon refinery module could not be found, software error!") });
 			return;
 		}
 
-		const action = module.actions.find(action => { return action.name === "harvest" })
+		const action = module.actions.find(action => { return action.name === "refine-sil" })
 
 		if (action === undefined) {
-			socket.emit('output', { msg: chalk.red("Harvest action could not be found, software error!") });
+			socket.emit('output', { msg: chalk.red("refine-sil action could not be found, software error!") });
 			return;
 		}
 
 		const task = tasks.createTaskWithAction(
-			"Harvesting materials",
-			"Arms",
-			"command-harvest",
+			"Refining silicon",
+			"Silicon refinery",
+			"command-refine-sil",
 			action
 		)
 
@@ -45,6 +45,6 @@ module.exports = {
 	},
 
 	runTask : function (task, character, socket) {
-		// nothing particular to do, but this function must exist
+		// nothing to do
 	}
 }
