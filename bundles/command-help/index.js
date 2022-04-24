@@ -6,11 +6,11 @@ module.exports = {
 	// called when bundle is loaded
 	init : function () {
 		const command = {
-			"keywords": ["help", "h"],
+			"keywords": ["info", "i", "help", "h"],
 			"run": this.runCommand.bind(this),
 			"helpCategory": "Meta",
-			"helpSyntax": ["help", "help <command>"],
-			"helpText": "Shows a list of all available commands ('help'), or information about a specific command ('help <command>')."
+			"helpSyntax": ["info", "info <command> | help <command>"],
+			"helpText": "Shows a information on all available commands, or information about a specific command."
 		};
 		
 		server.commands.push(command);
@@ -59,7 +59,7 @@ module.exports = {
 			categories.sort();
 			
 			
-			content = chalk.bold("Available commands") + "\nType \"help <command>\" for additional information.\n\n";
+			content = chalk.bold("Available commands") + "\nType \"info <command>\" for additional information.\n\n";
 
 			for (i = 0; i < categories.length; i++) {
 				const category = categories[i];
