@@ -188,7 +188,8 @@ module.exports = {
 					"duration": 100,
 					"changes": {
 						"status": "Operational",
-						"actions": ["scan-local"]
+						// TODO : add actions
+						//"actions": ["scan-local"]
 					}
 				}
 			],
@@ -237,7 +238,8 @@ module.exports = {
 					"duration": 400,
 					"changes": {
 						"status": "Operational",
-						"actions": ["scan-far"],
+						// TODO : add actions
+						//"actions": ["scan-far"],
 					}
 				}
 			],
@@ -337,7 +339,8 @@ module.exports = {
 					"duration": 250,
 					"changes": {
 						"status": "Operational",
-						"actions": ["crawl", "push", "latch"],
+						// TODO : add actions
+						//"actions": ["crawl", "push", "latch"],
 					}
 				}
 			],
@@ -427,7 +430,39 @@ module.exports = {
 			"valueTerm": "",
 			"warningBelow": 0,
 			"warningAbove": 1,
-			"actions": ["harvest", "fix", "upgrade"],
+			"actions": [
+				{
+					"name": "harvest",
+					"showCosts": true,
+					"costs": [
+						{
+							"amount": 5,
+							"type": "NRG"
+						}
+					],
+					"duration": 10,
+					"output": [
+						{
+							"amount": 20,
+							"type": "RAW"
+						}
+					]
+				},
+				{
+					"name": "fix",
+					"showCosts": false,
+					"costs": [],
+					"duration": 0,
+					"output": []
+				},
+				{
+					"name": "upgrade",
+					"showCosts": false,
+					"costs": [],
+					"duration": 0,
+					"output": []
+				}
+			],
 			"energy": 5,
 			"yield": 0,
 			"yieldType": "",
@@ -578,7 +613,20 @@ module.exports = {
 			"valueTerm": "Capacity",
 			"warningBelow": 0,
 			"warningAbove": 35,
-			"actions": ["dump"],
+			"actions": [
+				{
+					"name": "dump",
+					"showCosts": true,
+					"costs": [
+						{
+							"type": "NRG",
+							"amount": 2
+						}
+					],
+					"duration": 2,
+					"output": []
+				}
+			],
 			"energy": 0,
 			"yield": 0,
 			"yieldType": "",
@@ -653,6 +701,7 @@ module.exports = {
 					"changes": {
 						"status": "Some panel damage",
 						"yield": 10
+						// TODO : update action "charge" output to match yield
 					}
 				},
 				{
@@ -673,6 +722,7 @@ module.exports = {
 					],
 					"changes": {
 						"status": "Operational",
+						// TODO : update action "charge" output to match yield
 						"yield": 30
 					}
 				}
@@ -682,7 +732,20 @@ module.exports = {
 			"valueTerm": "Energy output",
 			"warningBelow": 20,
 			"warningAbove": 100,
-			"actions": ["charge"],
+			"actions": [
+				{
+					"name": "dump",
+					"showCosts": true,
+					"costs": [],
+					"duration": 3,
+					"output": [
+						{
+							"type": "NRG",
+							"amount": 6
+						}
+					]
+				}
+			],
 			"energy": 0,
 			"yield": 6,
 			"yieldType": "NRG",
@@ -821,7 +884,8 @@ module.exports = {
 					"duration": 900,
 					"changes": {
 						"status": "Operational",
-						"actions": ["fly"],
+						// TODO : add actions later
+						//"actions": ["fly"],
 					}
 				}
 			],

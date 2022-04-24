@@ -1,6 +1,8 @@
 const chalk = require("chalk");
-const config = require.main.require('./config.js');
+const Table = require("cli-table");
 const server = require.main.require('./bundles/server.js');
+const tasks = require.main.require("./bundles/tasks.js");
+const utils = require.main.require("./bundles/utils.js");
 
 module.exports = {
 	// called when bundle is loaded
@@ -114,6 +116,34 @@ module.exports = {
 				content += chalk.white("Example use: ") + command.helpExample.join(", ") + "\n";
 			}
 			content += "\n" + command.helpText + "\n";
+
+			const moduleForAction = character.modules.find(module => {
+				return module.actions.find(action => { return action.name === command.keywords[0]})
+			})
+			if (moduleForAction) {
+				const action = moduleForAction.actions.find(action => { return action.name === command.keywords[0]})
+
+				if (action && action.showCosts) {
+					const table = new Table({
+						head: [
+							chalk.whiteBright.bold("RUN COST"),
+							chalk.whiteBright.bold("DURATION"),
+							chalk.whiteBright.bold("OUTPUT"),
+						],
+						colWidths: [18, 10, 18],
+						chars: {'mid': '', 'left-mid': '', 'mid-mid': '', 'right-mid': ''}
+					});
+					table.push(
+						[
+							action.costs.length > 0 ? tasks.getCostsTable(action.costs) : chalk.green("\nFree"),
+							action.duration >= 0 ? ("\n" + action.duration) : chalk.green("\nInstant"),
+							action.output.length > 0 ? tasks.getCostsTable(action.output) : chalk.white("Does Action")
+						]
+					)
+					content += table.toString() + "\n"
+				}
+			}
+
 			socket.emit('output', { msg: content });
 		}
 	}

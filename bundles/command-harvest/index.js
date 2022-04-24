@@ -27,23 +27,18 @@ module.exports = {
 			return;
 		}
 
-		const task = tasks.createTask(
+		const harvestAction = armsModule.actions.find(action => { return action.name === "harvest" })
+
+		if (harvestAction === undefined) {
+			socket.emit('output', { msg: chalk.red("Harvest action could not be found, software error!") });
+			return;
+		}
+
+		const task = tasks.createTaskWithAction(
 			"Harvesting materials",
 			"Arms",
 			"command-harvest",
-			10,
-			[
-				{
-					"amount": armsModule.energy,
-					"type": "NRG"
-				}
-			],
-			[
-				{
-					"amount": 20,
-					"type": "RAW"
-				}
-			]
+			harvestAction
 		)
 
 		tasks.addTask(task, character, socket)

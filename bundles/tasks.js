@@ -22,6 +22,20 @@ module.exports = {
         }
     },
 
+    createTaskWithAction : function (name, moduleName, bundle, action, payload = {}) {
+        return {
+            "name": name,
+            "moduleName": moduleName,
+            "bundle": bundle,
+            "startTime": (new Date()).getTime(),
+            "duration": action.duration,
+            "costs": action.costs,
+            "output": action.output,
+            "payload": payload,
+            "complete": false
+        }
+    },
+
     printCosts : function (title, costs, socket) {
         let output = title + ":\n"
         output += this.getCostsTable(costs).toString()
