@@ -329,7 +329,7 @@ module.exports = {
 				}
 				let actions = chalk.gray("None")
 				if (module.actions.length !== 0) {
-					actions = module.actions.join(", ")
+					actions = module.actions.map(action => { return action.name })
 				}
 				table.push([utils.padGrayDots("Actions", namePadWidth, chalk.white), actions])
 

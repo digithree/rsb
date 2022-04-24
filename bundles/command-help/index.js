@@ -137,7 +137,7 @@ module.exports = {
 						[
 							action.costs.length > 0 ? tasks.getCostsTable(action.costs) : chalk.green("\nFree"),
 							action.duration >= 0 ? ("\n" + action.duration) : chalk.green("\nInstant"),
-							action.output.length > 0 ? tasks.getCostsTable(action.output) : chalk.white("Does Action")
+							action.output.length > 0 ? tasks.getCostsTable(action.output) : chalk.white("\nDoes Action")
 						]
 					)
 					content += table.toString() + "\n"
