@@ -7,6 +7,7 @@ const tasks = require.main.require("./bundles/tasks.js");
 const utils = require.main.require("./bundles/utils.js");
 const server = require.main.require('./bundles/server.js');
 const energy = require.main.require('./bundles/energy.js');
+const upgrades = require.main.require("./bundles/upgrades.js");
 
 const botGraphic = fs.readFileSync('./ascii-img/bot.txt').toString()
 const BOT_GRAPHIC_WIDTH = 24
@@ -250,13 +251,14 @@ module.exports = {
 					}
 				}
 
+				const upgradeSpecs = upgrades.specs.find(el => { return el.name.toLowerCase() === module.name.toLowerCase()})
 				let upgradeTitle = "Upgradable?"
 				let upgradeText = ""
 				if (!module.upgradeable) {
 					upgradeText = chalk.yellow("No")
 				} else if (module.level === 0) {
 					upgradeTitle = "Fixable?"
-					const upgradeSpecItem = module.upgradeSpec.find(spec => { return spec.level === 1 })
+					const upgradeSpecItem = upgradeSpecs.levels.find(spec => { return spec.level === 1 })
 					if (upgradeSpecItem === undefined) {
 						upgradeText = chalk.red('SOFTWARE ERROR')
 					} else {
@@ -264,7 +266,7 @@ module.exports = {
 							tasks.getCostsTable(upgradeSpecItem.costs)
 					}
 				} else {
-					const upgradeSpecItem = module.upgradeSpec.find(spec => { return spec.level === (module.level + 1) })
+					const upgradeSpecItem = upgradeSpecs.levels.find(spec => { return spec.level === (module.level + 1) })
 					if (upgradeSpecItem === undefined) {
 						upgradeText = chalk.yellow('At max level')
 					} else {

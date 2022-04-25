@@ -142,7 +142,6 @@ module.exports = {
 			"status": "Operational",
 			"level": 1,
 			"upgradeable": false,
-			"upgradeSpec": [],
 			"max": 1,
 			"current": 1,
 			"valueTerm": "",
@@ -168,31 +167,6 @@ module.exports = {
 			"status": "Unknown damage!",
 			"level": 0, // level 0 means error
 			"upgradeable": true,
-			"upgradeSpec": [
-				{
-					"level": 1,
-					"costs": [
-						{
-							type: "NRG",
-							amount: 60
-						},
-						{
-							type: "MET",
-							amount: 10
-						},
-						{
-							type: "SIL",
-							amount: 55
-						}
-					],
-					"duration": 100,
-					"changes": {
-						"status": "Operational",
-						// TODO : add actions
-						//"actions": ["scan-local"]
-					}
-				}
-			],
 			"max": 1,
 			"current": 0,
 			"valueTerm": "",
@@ -218,31 +192,6 @@ module.exports = {
 			"status": "Unknown damage!",
 			"level": 0,
 			"upgradeable": true,
-			"upgradeSpec": [
-				{
-					"level": 1,
-					"costs": [
-						{
-							type: "NRG",
-							amount: 80
-						},
-						{
-							type: "MET",
-							amount: 60
-						},
-						{
-							type: "SIL",
-							amount: 120
-						}
-					],
-					"duration": 400,
-					"changes": {
-						"status": "Operational",
-						// TODO : add actions
-						//"actions": ["scan-far"],
-					}
-				}
-			],
 			"max": 1,
 			"current": 0,
 			"valueTerm": "",
@@ -268,31 +217,6 @@ module.exports = {
 			"status": "Reduced capacity!",
 			"level": 1,
 			"upgradeable": true,
-			"upgradeSpec": [
-				{
-					"level": 2,
-					"costs": [
-						{
-							type: "NRG",
-							amount: 30
-						},
-						{
-							type: "MET",
-							amount: 5
-						},
-						{
-							type: "SIL",
-							amount: 30
-						}
-					],
-					"duration": 20,
-					"changes": {
-						"current": 256,
-						"energy": 4
-					}
-				}
-				// TODO : more levels
-			],
 			"max": 2048, //2^11
 			"current": 128,
 			"valueTerm": "Bytes",
@@ -318,31 +242,6 @@ module.exports = {
 			"status": "Latched to surface but motor stuck!",
 			"level": 0,
 			"upgradeable": true,
-			"upgradeSpec": [
-				{
-					"level": 1,
-					"costs": [
-						{
-							type: "NRG",
-							amount: 50
-						},
-						{
-							type: "MET",
-							amount: 140
-						},
-						{
-							type: "SIL",
-							amount: 30
-						}
-					],
-					"duration": 250,
-					"changes": {
-						"status": "Operational",
-						// TODO : add actions
-						//"actions": ["crawl", "push", "latch"],
-					}
-				}
-			],
 			"max": 1,
 			"current": 0,
 			"valueTerm": "",
@@ -423,7 +322,6 @@ module.exports = {
 			"status": "Operational",
 			"level": 1,
 			"upgradeable": false,
-			"upgradeSpec": [],
 			"max": 1,
 			"current": 0,
 			"valueTerm": "",
@@ -602,52 +500,6 @@ module.exports = {
 			"status": "Operational",
 			"level": 1,
 			"upgradeable": true,
-			"upgradeSpec": [
-				{
-					"level": 2,
-					"costs": [
-						{
-							type: "NRG",
-							amount: 15
-						},
-						{
-							type: "MET",
-							amount: 10
-						},
-						{
-							type: "SIL",
-							amount: 5
-						}
-					],
-					"duration": 15,
-					"changes": {
-						"max": 80,
-						"warningAbove": 70
-					}
-				},
-				{
-					"level": 3,
-					"costs": [
-						{
-							type: "NRG",
-							amount: 30
-						},
-						{
-							type: "MET",
-							amount: 40
-						},
-						{
-							type: "SIL",
-							amount: 25
-						}
-					],
-					"duration": 25,
-					"changes": {
-						"max": 200,
-						"warningAbove": 180
-					}
-				}
-			],
 			"max": 40,
 			"current": 0,
 			"valueTerm": "Capacity",
@@ -692,7 +544,6 @@ module.exports = {
 			"status": "Operational",
 			"level": 1,
 			"upgradeable": true,
-			"upgradeSpec": [], //TODO
 			"max": 1,
 			"current": 0,
 			"valueTerm": "",
@@ -719,53 +570,6 @@ module.exports = {
 			"status": "Major panel damage!",
 			"level": 1,
 			"upgradeable": true,
-			"upgradeSpec": [
-				{
-					"level": 2,
-					"costs": [
-						{
-							type: "NRG",
-							amount: 15
-						},
-						{
-							type: "MET",
-							amount: 30
-						},
-						{
-							type: "SIL",
-							amount: 30
-						}
-					],
-					"duration": 20,
-					"changes": {
-						"status": "Some panel damage",
-						"yield": 18
-						// TODO : update action "charge" output to match yield
-					}
-				},
-				{
-					"level": 3,
-					"costs": [
-						{
-							type: "NRG",
-							amount: 50
-						},
-						{
-							type: "MET",
-							amount: 70
-						},
-						{
-							type: "SIL",
-							amount: 70
-						}
-					],
-					"changes": {
-						"status": "Operational",
-						// TODO : update action "charge" output to match yield
-						"yield": 40
-					}
-				}
-			],
 			"max": 100,
 			"current": 5,
 			"valueTerm": "Energy output",
@@ -804,54 +608,6 @@ module.exports = {
 			"status": "Critically low capacity!",
 			"level": 1,
 			"upgradeable": true,
-			"upgradeSpec": [
-				{
-					"level": 2,
-					"costs": [
-						{
-							type: "NRG",
-							amount: 15
-						},
-						{
-							type: "MET",
-							amount: 5
-						},
-						{
-							type: "SIL",
-							amount: 30
-						}
-					],
-					"duration": 40,
-					"changes": {
-						"status": "Low capacity",
-						"max": 50,
-						"warningBelow": 20
-					}
-				},
-				{
-					"level": 3,
-					"costs": [
-						{
-							type: "NRG",
-							amount: 50
-						},
-						{
-							type: "MET",
-							amount: 15
-						},
-						{
-							type: "SIL",
-							amount: 50
-						}
-					],
-					"duration": 80,
-					"changes": {
-						"status": "Moderate capacity",
-						"max": 90,
-						"warningBelow": 30
-					}
-				}
-			],
 			"max": 20,
 			"current": 20,
 			"valueTerm": "Stored",
@@ -903,31 +659,6 @@ module.exports = {
 			"status": "Unknown damage!",
 			"level": 0,
 			"upgradeable": true,
-			"upgradeSpec": [
-				{
-					"level": 1,
-					"costs": [
-						{
-							type: "NRG",
-							amount: 200
-						},
-						{
-							type: "MET",
-							amount: 400
-						},
-						{
-							type: "SIL",
-							amount: 250
-						}
-					],
-					"duration": 900,
-					"changes": {
-						"status": "Operational",
-						// TODO : add actions later
-						//"actions": ["fly"],
-					}
-				}
-			],
 			"max": 1,
 			"current": 0,
 			"valueTerm": "Thrust",

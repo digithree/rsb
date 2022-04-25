@@ -24,15 +24,18 @@ module.exports = {
 		arguments = arguments.toLowerCase();
 
 		const module = character.modules.find(el => { return el.name.toLowerCase() === arguments})
+		const upgradeSpecs = upgrades.specs.find(el => { return el.name.toLowerCase() === arguments})
 
 		if (module === undefined) {
-			socket.emit('output', { msg: chalk.red("Cannot locate module \"" + arguments + "\" to fix, did you misspell it?") })
+			socket.emit('output', {msg: chalk.red("Cannot locate module \"" + arguments + "\" to fix, did you misspell it?")})
+		} else if (upgradeSpecs === undefined) {
+			socket.emit('output', { msg: chalk.red("Cannot locate upgrade specs for \"" + arguments + "\" to fix, did you misspell it?") })
 		} else if (module.level > 0) {
 			socket.emit('output', {msg: chalk.yellow("Module \"" + arguments + "\" does not need to be fixed!")})
 		} else if (!module.upgradeable) {
 			socket.emit('output', {msg: chalk.red("Module \"" + arguments + "\" cannot be fixed, permanently broken!")})
 		} else {
-			const upgradeSpecItem = module.upgradeSpec.find(spec => { return spec.level === 1 })
+			const upgradeSpecItem = upgradeSpecs.levels.find(spec => { return spec.level === 1 })
 			if (upgradeSpecItem === undefined) {
 				socket.emit('output', {msg: chalk.red("Module \"" + arguments + "\" cannot be fixed, permanently broken!")})
 			} else {
