@@ -328,11 +328,11 @@ module.exports = {
 						},
 						{
 							type: "MET",
-							amount: 150
+							amount: 140
 						},
 						{
 							type: "SIL",
-							amount: 90
+							amount: 30
 						}
 					],
 					"duration": 250,
@@ -729,17 +729,17 @@ module.exports = {
 						},
 						{
 							type: "MET",
-							amount: 20
+							amount: 30
 						},
 						{
 							type: "SIL",
-							amount: 10
+							amount: 30
 						}
 					],
 					"duration": 20,
 					"changes": {
 						"status": "Some panel damage",
-						"yield": 10
+						"yield": 18
 						// TODO : update action "charge" output to match yield
 					}
 				},
@@ -752,17 +752,17 @@ module.exports = {
 						},
 						{
 							type: "MET",
-							amount: 50
+							amount: 70
 						},
 						{
 							type: "SIL",
-							amount: 35
+							amount: 70
 						}
 					],
 					"changes": {
 						"status": "Operational",
 						// TODO : update action "charge" output to match yield
-						"yield": 30
+						"yield": 40
 					}
 				}
 			],
