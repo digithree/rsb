@@ -92,7 +92,7 @@ module.exports = {
 
 		// "Status". No arguments (i.e. "status" or "status bot"), so status of bot
 		if (arguments === "" || arguments === "bot") {
-			output += "Modules status:\n\n";
+			output += "Modules status:\n";
 			const energyStats = energy.energyStats(character)
 			const batteryModule = character.modules.find(el => { return el.name === "Battery"})
 			const storageModule = character.modules.find(el => { return el.name === "Storage"})
@@ -161,7 +161,7 @@ module.exports = {
 				}
 			}) + "\n"
 
-			output += "\nResources:\n\n"
+			output += "Resources:\n"
 
 			table = new Table({
 				colWidths: [20, 17],
@@ -176,7 +176,10 @@ module.exports = {
 			}
 			let colText = chalk.hex(col);
 			table.push(
-				[utils.padGrayDots("Battery", namePadWidth, chalk.white), colText(energyStats.battery)]
+				[
+					utils.padGrayDots("Battery", namePadWidth, chalk.white),
+					colText(energyStats.battery + " / " + batteryModule.max)
+				]
 			)
 
 			col = colors.green
@@ -200,8 +203,8 @@ module.exports = {
 			table.push(
 				[
 					utils.padGrayDots("Storage", namePadWidth, chalk.white),
-					colText(storageModule.current + " / " + storageModule.max) + "\n" +
-						tasks.getCostsTable(character.storage)
+					colText(storageModule.current + " / " + storageModule.max) +
+					(character.storage.length > 0 ? ("\n" + tasks.getCostsTable(character.storage)) : "")
 				]
 			)
 
@@ -257,14 +260,16 @@ module.exports = {
 					if (upgradeSpecItem === undefined) {
 						upgradeText = chalk.red('SOFTWARE ERROR')
 					} else {
-						upgradeText = "Fix costs:\n" + tasks.getCostsTable(upgradeSpecItem.costs)
+						upgradeText = "Fix duration " + upgradeSpecItem.duration + ", costs:\n" +
+							tasks.getCostsTable(upgradeSpecItem.costs)
 					}
 				} else {
 					const upgradeSpecItem = module.upgradeSpec.find(spec => { return spec.level === (module.level + 1) })
 					if (upgradeSpecItem === undefined) {
 						upgradeText = chalk.yellow('At max level')
 					} else {
-						upgradeText = "Level " + (module.level + 1) + " costs:\n" + tasks.getCostsTable(upgradeSpecItem.costs)
+						upgradeText = "Level " + (module.level + 1) + " duration " + upgradeSpecItem.duration +
+							", costs:\n" + tasks.getCostsTable(upgradeSpecItem.costs)
 					}
 				}
 

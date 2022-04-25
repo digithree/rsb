@@ -11,7 +11,7 @@ module.exports = {
 	welcomeMessage: chalk.blue("-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-\n\n")
 		+ chalk.yellow(titleGraphic) + "\n\n"
 		+ chalk.blue("-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-\n\n")
-		+ "You have logged into the " + chalk.cyanBright("Remote SpaceBot") + " controller tool.",
+		+ "You have connected to the " + chalk.cyanBright("Remote SpaceBot") + " controller tool.",
 
 	// if true, will show general server info on welcome screen
 	showServerInfo: true,
@@ -67,6 +67,7 @@ module.exports = {
 		"command-dump",
 		"command-refine-sil",
 		"command-refine-met",
+		"command-charge",
 		"command-fix",
 		"command-upgrade",
 	],

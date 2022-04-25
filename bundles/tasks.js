@@ -37,8 +37,12 @@ module.exports = {
     },
 
     printCosts : function (title, costs, socket) {
-        let output = title + ":\n"
-        output += this.getCostsTable(costs).toString()
+        let output = title + ":"
+        if (costs.length > 0) {
+            output += "\n" + this.getCostsTable(costs).toString()
+        } else {
+            output += " Free"
+        }
         socket.emit('output', {msg: output })
     },
 
@@ -64,7 +68,11 @@ module.exports = {
         const batteryModule = character.modules.find(el => { return el.name === "Battery"})
         const storageModule = character.modules.find(el => { return el.name === "Storage"})
 
-        this.printCosts("Task costs", task.costs, socket)
+        this.printCosts(
+            "\"" + task.name + "\" duration " + task.duration + " " + this.TIME_UNIT_READABLE + ", costs",
+            task.costs,
+            socket
+        )
 
         let result = {
             added: true,
@@ -99,7 +107,7 @@ module.exports = {
                 } else if (materialStored.amount - item.amount < 0) {
                     costAfforded = false
                     failedResultText += chalk.red(
-                        "\n- not enough " + item.type + " (need " + ((materialStored.amount - item.amount) * -1) + ")"
+                        "\n\t- not enough " + item.type + " (need " + ((materialStored.amount - item.amount) * -1) + ")"
                     )
                 }
             }
@@ -115,7 +123,7 @@ module.exports = {
                     if (batteryModule.current === batteryModule.max) {
                         hasStorageSpace = false
                         failedResultText += chalk.red(
-                            "\n- battery does not need NRG," + "is full"
+                            "\n\t- battery does not need NRG, is full"
                         )
                     }
                 } else {
@@ -125,7 +133,7 @@ module.exports = {
                     if (storageTracking > storageModule.max) {
                         hasStorageSpace = false
                         failedResultText += chalk.red(
-                            "\n- not enough storage space for " + item.amount + " " + item.type
+                            "\n\t- not enough storage space for " + item.amount + " " + item.type
                         )
                     }
                 }
@@ -172,6 +180,7 @@ module.exports = {
             }
             // add task to queue
             character.tasks.push(task)
+            this.processTasks(character, socket)
         }
         return result.added
     },
@@ -200,7 +209,7 @@ module.exports = {
                 const taskDuration = (task.duration * this.TIME_UNIT)
                 if (leftOverTime - taskDuration >= 0) {
                     // task is complete
-                    output += chalk.green("\n[task " + task.name + " is complete]")
+                    output += chalk.green("[task " + task.name + " is complete]\n")
                     // then store materials, if any
                     if (task.output.length > 0) {
                         storage.storeMaterials(task.output, character, socket)
@@ -221,11 +230,11 @@ module.exports = {
                         const timeLeft = (leftOverTime - taskDuration) * -1
                         const timeLeftReadable = timeLeft === 0 ? 0 : (timeLeft / 1000).toFixed(2)
                         output += chalk.blue(
-                            "\n[time left on task " + task.name + " is "
-                            + timeLeftReadable + " " + this.TIME_UNIT_READABLE + "]"
+                            "[time left on task " + task.name + " is "
+                            + timeLeftReadable + " " + this.TIME_UNIT_READABLE + "]\n"
                         )
                     } else {
-                        output += chalk.gray("\n[queued task " + task.name + "]")
+                        output += chalk.gray("[queued task " + task.name + "]\n")
                     }
                 }
             }

@@ -25,8 +25,8 @@ module.exports = {
 		
 		// Start parsing commands
 		socket.on('input', function (data) {
-			this.runCommand(data.msg, socket.character);
 			tasks.processTasks(socket.character, socket)
+			this.runCommand(data.msg, socket.character);
 		}.bind(this));
 		
 		// Listener for when user disconnects
@@ -57,7 +57,8 @@ module.exports = {
 
 		socket.emit('output', { msg: "Fetching status..." });
 
-		// Run "status" command by default when connecting
+		// run auto tasks on first start up
+		tasks.processTasks(socket.character, socket)
 		this.runCommand("status", socket.character);
 	},
 

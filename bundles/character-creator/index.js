@@ -773,7 +773,7 @@ module.exports = {
 			"warningAbove": 100,
 			"actions": [
 				{
-					"name": "dump",
+					"name": "charge",
 					"showCosts": true,
 					"costs": [],
 					"duration": 3,

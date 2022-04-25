@@ -9,16 +9,16 @@ module.exports = {
     },
 
     applyUpgrade : function (moduleName, newLevel, character, socket) {
-        const module = character.modules.find(el => { return el.name.toLowerCase() === moduleName.toLocaleString()})
+        const module = character.modules.find(el => { return el.name.toLowerCase() === moduleName.toLowerCase()})
 
         if (module === undefined) {
-            socket.emit('output', { msg: chalk.red("Cannot apply upgrade to module \"" + arguments + "\", module not found") })
+            socket.emit('output', { msg: chalk.red("Cannot apply upgrade to module \"" + moduleName + "\", module not found") })
         } else {
             const upgradeSpecItem = module.upgradeSpec.find(spec => { return spec.level === newLevel })
 
             if (upgradeSpecItem === undefined) {
                 socket.emit('output', { msg:
-                        chalk.red("Cannot apply upgrade to module \"" + arguments + "\", level "
+                        chalk.red("Cannot apply upgrade to module \"" + moduleName + "\", level "
                             + newLevel + " spec not found")
                 })
             } else {
