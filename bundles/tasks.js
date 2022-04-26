@@ -188,7 +188,7 @@ module.exports = {
                 const taskDuration = (task.duration * this.TIME_UNIT)
                 if (leftOverTime - taskDuration >= 0) {
                     // task is complete
-                    output += chalk.green("[task " + task.name + " is complete]\n")
+                    output += chalk.green("[" + task.name + " is complete]\n")
                     // then store materials, if any
                     if (task.output.length > 0) {
                         storage.storeMaterials(task.output, character, socket)
@@ -206,15 +206,16 @@ module.exports = {
                             break
                         }
                     }
+                    const timeLeft = (leftOverTime - taskDuration) * -1
+                    const timeLeftReadable = timeLeft === 0 ? 0 : (timeLeft / 1000).toFixed(2)
                     if (isFirstNotCompleteTask) {
-                        const timeLeft = (leftOverTime - taskDuration) * -1
-                        const timeLeftReadable = timeLeft === 0 ? 0 : (timeLeft / 1000).toFixed(2)
                         output += chalk.blue(
-                            "[time left on task " + task.name + " is "
+                            "[" + task.name + " is running, time left: "
                             + timeLeftReadable + " " + this.TIME_UNIT_READABLE + "]\n"
                         )
                     } else {
-                        output += chalk.gray("[queued task " + task.name + "]\n")
+                        output += chalk.gray("[" + task.name + " is queued, time left:" + timeLeftReadable +
+                            " " + this.TIME_UNIT_READABLE + "]\n")
                     }
                 }
             }

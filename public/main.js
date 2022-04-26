@@ -20,7 +20,6 @@ $(function() {
             tasks.forEach(task => {
                 task.timeLeft -= 1000
 
-                console.log("time left = " + task.timeLeft)
                 html += "<p>Task: " + task.name + "</p>"
 
                 let timeLeftAdjusted = task.timeLeft + 1000 // add a second to adjust for error
