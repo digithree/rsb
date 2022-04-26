@@ -6,6 +6,7 @@ $(function() {
     const $tasksElement = $('.tasks');
     const socket = io();
 
+    let hasTasksUpdatePropagatedToSocket = false;
     let tasks = [];
 
     const timer = setInterval(function() {
@@ -15,18 +16,20 @@ $(function() {
         } else {
             let html = ""
             let firstTask = true
+            let doTaskUpdate = false
             tasks.forEach(task => {
                 task.timeLeft -= 1000
 
                 console.log("time left = " + task.timeLeft)
                 html += "<p>Task: " + task.name + "</p>"
 
+                let timeLeftAdjusted = task.timeLeft + 1000 // add a second to adjust for error
                 let timeLeftReadable = ""
-                if (task.timeLeft > 0) {
-                    const days = Math.floor(task.timeLeft / (1000 * 60 * 60 * 24));
-                    const hours = Math.floor((task.timeLeft % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-                    const minutes = Math.floor((task.timeLeft % (1000 * 60 * 60)) / (1000 * 60));
-                    const seconds = Math.floor((task.timeLeft % (1000 * 60)) / 1000) + 1;
+                if (timeLeftAdjusted > 0) {
+                    const days = Math.floor(timeLeftAdjusted / (1000 * 60 * 60 * 24));
+                    const hours = Math.floor((timeLeftAdjusted % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                    const minutes = Math.floor((timeLeftAdjusted % (1000 * 60 * 60)) / (1000 * 60));
+                    const seconds = Math.floor((timeLeftAdjusted % (1000 * 60)) / 1000);
                     if (days > 0) {
                         timeLeftReadable += days + "d "
                     }
@@ -41,6 +44,7 @@ $(function() {
                     }
                 } else {
                     timeLeftReadable = "FINISHED"
+                    doTaskUpdate = true
                 }
 
                 html += "<p>Time left: " + timeLeftReadable + "</p>"
@@ -52,6 +56,16 @@ $(function() {
             })
             $tasksElement[0].innerHTML = html
             $tasksElement[0].style.color = "#eee"
+            // if a tasks was finished and there is no input in the input field then update tasks on server by
+            // sending command "tasks"
+            if (doTaskUpdate && !hasTasksUpdatePropagatedToSocket) {
+                const inputMessage = cleanInput($inputElement.val())
+                if (inputMessage === "") {
+                    hasTasksUpdatePropagatedToSocket = true
+                    $inputElement.val("tasks")
+                    sendMessage()
+                }
+            }
         }
     }, 1000)
 
@@ -143,7 +157,7 @@ $(function() {
     // server emits 'tasks', task timers to display
     socket.on('tasks', function (data) {
         connected = true;
-
         tasks = data.tasks
+        hasTasksUpdatePropagatedToSocket = false
     });
 });
