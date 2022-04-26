@@ -3,6 +3,7 @@ const Table = require("cli-table");
 const server = require.main.require('./bundles/server.js');
 const energy = require.main.require('./bundles/energy.js');
 const storage = require.main.require("./bundles/storage.js");
+const tasksUtils = require.main.require("./bundles/tasks-utils.js");
 
 module.exports = {
     "TIME_UNIT": 1000, // 1 sec
@@ -36,31 +37,6 @@ module.exports = {
         }
     },
 
-    printCosts : function (title, costs, socket) {
-        let output = title + ":"
-        if (costs.length > 0) {
-            output += "\n" + this.getCostsTable(costs).toString()
-        } else {
-            output += " Free"
-        }
-        socket.emit('output', {msg: output })
-    },
-
-    getCostsTable : function (costs) {
-        const table = new Table({
-            head: [
-                chalk.whiteBright.bold("AMT"),
-                chalk.whiteBright.bold("TYPE"),
-            ],
-            colWidths: [6, 6],
-            chars: {'mid': '', 'left-mid': '', 'mid-mid': '', 'right-mid': ''}
-        });
-        costs.forEach(cost => {
-            table.push([chalk.white(cost.type), chalk.yellowBright(cost.amount)])
-        })
-        return table.toString()
-    },
-
     addTask : function (task, character, socket) {
         const memoryBytes = character.modules.find(el => { return el.name === "Memory"}).current
 
@@ -68,8 +44,10 @@ module.exports = {
         const batteryModule = character.modules.find(el => { return el.name === "Battery"})
         const storageModule = character.modules.find(el => { return el.name === "Storage"})
 
-        this.printCosts(
-            "\"" + task.name + "\" duration " + task.duration + " " + this.TIME_UNIT_READABLE + ", costs",
+        tasksUtils.printCosts(
+            "\"" + task.name + "\" " +
+                chalk.yellowBright("duration " + task.duration + " " + this.TIME_UNIT_READABLE) +
+                ", costs",
             task.costs,
             socket
         )
@@ -201,6 +179,7 @@ module.exports = {
     processTasks : function (character, socket, currentTime = (new Date()).getTime()) {
         if (character === null) return // character not set up yet
         if (character.tasks.length > 0) {
+            let displayStorageAfter = false
             socket.emit('output', { msg: chalk.blue("-".repeat(5) + "TASKS QUEUE" + "-".repeat(40)) })
             let output = ""
             for (let taskIndex = 0; taskIndex < character.tasks.length; taskIndex++) {
@@ -213,6 +192,7 @@ module.exports = {
                     // then store materials, if any
                     if (task.output.length > 0) {
                         storage.storeMaterials(task.output, character, socket)
+                        displayStorageAfter = true
                     }
                     // run specific task function
                     server.bundles[task.bundle].runTask(task, character, socket)
@@ -240,6 +220,9 @@ module.exports = {
             }
             socket.emit('output', { msg: output })
             character.tasks = character.tasks.filter(task => { return task.complete === false })
+            if (displayStorageAfter) {
+                storage.printResources(character, socket)
+            }
         }
     },
 }

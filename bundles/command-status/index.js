@@ -6,34 +6,26 @@ const fs = require('fs');
 const tasks = require.main.require("./bundles/tasks.js");
 const utils = require.main.require("./bundles/utils.js");
 const server = require.main.require('./bundles/server.js');
-const energy = require.main.require('./bundles/energy.js');
 const upgrades = require.main.require("./bundles/upgrades.js");
+const storage = require.main.require("./bundles/storage.js");
+const tasksUtils = require.main.require("./bundles/tasks-utils.js");
 
 const botGraphic = fs.readFileSync('./ascii-img/bot.txt').toString()
 const BOT_GRAPHIC_WIDTH = 24
-const colors = {
-	"red": "#FF0000",
-	"green": "#00FF00",
-	"orange": "#FF9933",
-	"blue": "#0000FF",
-	"magenta": "#FF00FF",
-	"cyan": "#00FFFF",
-	"white": "#FFFFFF"
-}
 
 function moduleColor(module, character) {
 	const isTaskActive = character.tasks.find(task => { return task.moduleName === module.name }) !== undefined
 	const permType = module.type === "perm"
 
-	let col = colors.cyan;
+	let col = utils.colors.cyan;
 	if (module.level === 0) {
-		col = colors.red
+		col = utils.colors.red
 	} else if (module.current < module.warningBelow || module.current > module.warningAbove) {
-		col = colors.orange
+		col = utils.colors.orange
 	} else if (permType) {
-		col = colors.green
+		col = utils.colors.green
 	} else if (isTaskActive) {
-		col = colors.magenta
+		col = utils.colors.magenta
 	}
 	return col
 }
@@ -94,9 +86,6 @@ module.exports = {
 		// "Status". No arguments (i.e. "status" or "status bot"), so status of bot
 		if (arguments === "" || arguments === "bot") {
 			output += "Modules status:\n";
-			const energyStats = energy.energyStats(character)
-			const batteryModule = character.modules.find(el => { return el.name === "Battery"})
-			const storageModule = character.modules.find(el => { return el.name === "Storage"})
 
 			let table = new Table({
 				head: [
@@ -111,7 +100,6 @@ module.exports = {
 
 			const namePadWidth = 18
 			const costPadWidth = 8
-			const yieldsPadWidth = 7
 
 			character.modules.forEach(module => {
 				let col = moduleColor(module, character)
@@ -133,9 +121,9 @@ module.exports = {
 				if (permType) {
 					activeText = chalk.green("PERM")
 				} else if (isTaskActive) {
-					activeText = chalk.hex(colors.magenta)("TASK")
+					activeText = chalk.hex(utils.colors.magenta)("TASK")
 				} else if (module.level > 0) {
-					activeText = chalk.hex(colors.cyan)("IDLE")
+					activeText = chalk.hex(utils.colors.cyan)("IDLE")
 				}
 
 				table.push(
@@ -160,62 +148,11 @@ module.exports = {
 					x: 53,
 					y: 0
 				}
-			}) + "\n"
+			})
 
-			output += "Resources:\n"
+			socket.emit('output', { msg: output });
 
-			table = new Table({
-				colWidths: [20, 17],
-				chars: {'mid': '', 'left-mid': '', 'mid-mid': '', 'right-mid': ''}
-			});
-
-			let col = colors.green
-			if (energyStats.battery < batteryModule.warningBelow) {
-				col = colors.orange
-			} else if (energyStats.battery < 0) {
-				col = colors.red
-			}
-			let colText = chalk.hex(col);
-			table.push(
-				[
-					utils.padGrayDots("Battery", namePadWidth, chalk.white),
-					colText(energyStats.battery + " / " + batteryModule.max)
-				]
-			)
-
-			col = colors.green
-			if (energyStats.netEnergy === 0) {
-				col = colors.orange
-			} else if (energyStats.netEnergy < 0) {
-				col = colors.red
-			}
-			colText = chalk.hex(col)
-			table.push(
-				[utils.padGrayDots("Net energy", namePadWidth, chalk.white), colText(energyStats.netEnergy)]
-			)
-
-			col = colors.green
-			if (storageModule.current === storageModule.max) {
-				col = colors.red
-			} else if (storageModule.current > storageModule.warningAbove) {
-				col = colors.orange
-			}
-			colText = chalk.hex(col)
-			table.push(
-				[
-					utils.padGrayDots("Storage", namePadWidth, chalk.white),
-					colText(storageModule.current + " / " + storageModule.max) +
-					(character.storage.length > 0 ? ("\n" + tasks.getCostsTable(character.storage)) : "")
-				]
-			)
-
-			output += table.toString() + "\n"
-
-			if (energyStats.netEnergy >= 0) {
-				output += chalk.green('Positive net energy: battery will not deplete')
-			} else {
-				output += chalk.hex(colors.orange)('NEGATIVE net energy: battery WILL deplete')
-			}
+			storage.printResources(character, socket)
 		} else if (arguments) {
 			// "Status <object>". Get a specific status
 			const module = character.modules.find(el => el.name.toLowerCase() === arguments);
@@ -263,7 +200,7 @@ module.exports = {
 						upgradeText = chalk.red('SOFTWARE ERROR')
 					} else {
 						upgradeText = "Fix duration " + upgradeSpecItem.duration + ", costs:\n" +
-							tasks.getCostsTable(upgradeSpecItem.costs)
+							tasksUtils.getCostsTable(upgradeSpecItem.costs)
 					}
 				} else {
 					const upgradeSpecItem = upgradeSpecs.levels.find(spec => { return spec.level === (module.level + 1) })
@@ -271,7 +208,7 @@ module.exports = {
 						upgradeText = chalk.yellow('At max level')
 					} else {
 						upgradeText = "Level " + (module.level + 1) + " duration " + upgradeSpecItem.duration +
-							", costs:\n" + tasks.getCostsTable(upgradeSpecItem.costs)
+							", costs:\n" + tasksUtils.getCostsTable(upgradeSpecItem.costs)
 					}
 				}
 
@@ -293,7 +230,7 @@ module.exports = {
 				table.push(
 					[utils.padGrayDots(upgradeTitle, namePadWidth, chalk.white), upgradeText],
 					[utils.padGrayDots("Error?", namePadWidth, chalk.white), (module.level === 0 ? chalk.redBright('ERROR') : chalk.gray('None'))],
-					[utils.padGrayDots("Warning?", namePadWidth, chalk.white), (warning ? chalk.hex(colors.orange)(utils.wrap(warningText, maxLine)) : chalk.gray('None'))],
+					[utils.padGrayDots("Warning?", namePadWidth, chalk.white), (warning ? chalk.hex(utils.colors.orange)(utils.wrap(warningText, maxLine)) : chalk.gray('None'))],
 					[utils.padGrayDots("Activity", namePadWidth, chalk.white), activity],
 				)
 
@@ -311,7 +248,7 @@ module.exports = {
 				if (module.name === "Storage") {
 					let storageText = ""
 					if (character.storage.length > 0) {
-						storageText = tasks.getCostsTable(character.storage)
+						storageText = tasksUtils.getCostsTable(character.storage)
 					} else {
 						storageText = chalk.gray("None")
 					}
@@ -353,7 +290,7 @@ module.exports = {
 			} else {
 				output += "Status not found for area " + chalk.bgRed(arguments)
 			}
+			socket.emit('output', { msg: output });
 		}
-		socket.emit('output', { msg: output });
 	},
 }

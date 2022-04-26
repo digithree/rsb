@@ -2,7 +2,7 @@ const chalk = require("chalk");
 const Table = require("cli-table");
 const server = require.main.require('./bundles/server.js');
 const tasks = require.main.require("./bundles/tasks.js");
-const utils = require.main.require("./bundles/utils.js");
+const tasksUtils = require.main.require("./bundles/tasks-utils.js");
 
 module.exports = {
 	// called when bundle is loaded
@@ -135,9 +135,9 @@ module.exports = {
 					});
 					table.push(
 						[
-							action.costs.length > 0 ? tasks.getCostsTable(action.costs) : chalk.green("\nFree"),
+							action.costs.length > 0 ? tasksUtils.getCostsTable(action.costs) : chalk.green("\nFree"),
 							action.duration >= 0 ? ("\n" + action.duration) : chalk.green("\nInstant"),
-							action.output.length > 0 ? tasks.getCostsTable(action.output) : chalk.white("\nDoes Action")
+							action.output.length > 0 ? tasksUtils.getCostsTable(action.output) : chalk.white("\nDoes Action")
 						]
 					)
 					content += table.toString() + "\n"

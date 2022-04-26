@@ -1,5 +1,8 @@
 const chalk = require("chalk");
-const tasks = require.main.require("./bundles/tasks.js");
+const Table = require("cli-table");
+const utils = require.main.require("./bundles/utils.js");
+const energy = require.main.require('./bundles/energy.js');
+const tasksUtils = require.main.require("./bundles/tasks-utils.js");
 
 module.exports = {
     storeMaterials : function (materials, character, socket) {
@@ -72,17 +75,72 @@ module.exports = {
             }
         })
 
-        storageLeft = storageModule.max - storageModule.current
-        if (changedStorage) {
-            output += "\nStorage is now: "
-                + (storageLeft > 0 ? chalk.green("" + storageModule.current) : chalk.yellow(storageModule.current))
-                + " / " + storageModule.max + (changedBattery ? "\n" : "")
+        if (output.slice(-1) === "\n") {
+            output = output.substring(0, output.length - 1)
         }
-        if (changedBattery) {
-            const batteryCapacity = batteryModule.max - batteryModule.current
-            output += "\nBattery is now: "
-                + (batteryCapacity > 0 ? chalk.green("" + batteryModule.current) : chalk.yellow("" + batteryModule.current))
-                + " / " + batteryModule.max
+
+        socket.emit('output', { msg: output });
+    },
+
+    printResources : function (character, socket) {
+        const batteryModule = character.modules.find(el => { return el.name === "Battery"})
+        const storageModule = character.modules.find(el => { return el.name === "Storage"})
+        const energyStats = energy.energyStats(character)
+
+        let output = "Resources:\n"
+
+        const table = new Table({
+            colWidths: [20, 17],
+            chars: {'mid': '', 'left-mid': '', 'mid-mid': '', 'right-mid': ''}
+        });
+        const namePadWidth = 18
+
+        let col = utils.colors.green
+        if (energyStats.battery < batteryModule.warningBelow) {
+            col = utils.colors.orange
+        } else if (energyStats.battery < 0) {
+            col = utils.colors.red
+        }
+        let colText = chalk.hex(col);
+        table.push(
+            [
+                utils.padGrayDots("Battery", namePadWidth, chalk.white),
+                colText(energyStats.battery + " / " + batteryModule.max)
+            ]
+        )
+
+        col = utils.colors.green
+        if (energyStats.netEnergy === 0) {
+            col = utils.colors.orange
+        } else if (energyStats.netEnergy < 0) {
+            col = utils.colors.red
+        }
+        colText = chalk.hex(col)
+        table.push(
+            [utils.padGrayDots("Net energy", namePadWidth, chalk.white), colText(energyStats.netEnergy)]
+        )
+
+        col = utils.colors.green
+        if (storageModule.current === storageModule.max) {
+            col = utils.colors.red
+        } else if (storageModule.current > storageModule.warningAbove) {
+            col = utils.colors.orange
+        }
+        colText = chalk.hex(col)
+        table.push(
+            [
+                utils.padGrayDots("Storage", namePadWidth, chalk.white),
+                colText(storageModule.current + " / " + storageModule.max) +
+                (character.storage.length > 0 ? ("\n" + tasksUtils.getCostsTable(character.storage)) : "")
+            ]
+        )
+
+        output += table.toString() + "\n"
+
+        if (energyStats.netEnergy >= 0) {
+            output += chalk.green('Positive net energy: battery will not deplete')
+        } else {
+            output += chalk.hex(utils.colors.orange)('NEGATIVE net energy: battery WILL deplete')
         }
 
         socket.emit('output', { msg: output });
