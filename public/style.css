@@ -34,9 +34,7 @@ body {
   font-size: 100%;
   max-width: 800px;
   margin: auto;
-}
 
-.inputMessage {
   /*border: 10px solid #000;*/
   border: 1px solid #fff;
   background-color: #181818;
@@ -56,4 +54,24 @@ body {
   /*height: 90vh;*/
   margin-left: 12px;
   margin-right: 12px;
+}
+
+.tasks {
+  font-family: monospace;
+  font-size: 14px;
+
+  border: 1px solid #777;
+  background-color: #181818;
+  color: #999;
+  outline: none;
+
+  width: 300px;
+  margin-left: 10px;
+  margin-top: 10px;
+  margin-right: auto;
+  margin-bottom: auto;
+  padding: 10px;
+  position: absolute;
+  left: 0;
+  top: 0;
 }

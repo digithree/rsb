@@ -224,5 +224,17 @@ module.exports = {
                 storage.printResources(character, socket)
             }
         }
+        if (character.tasks.length > 0) {
+            socket.emit('tasks', {
+                "tasks": character.tasks.map(task => {
+                    return {
+                        "name": task.name,
+                        "timeLeft": (currentTime - (task.startTime + (task.duration * this.TIME_UNIT))) * -1
+                    }
+                })
+            })
+        } else {
+            socket.emit('tasks', { "tasks": [] })
+        }
     },
 }

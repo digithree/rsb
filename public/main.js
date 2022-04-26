@@ -3,7 +3,57 @@ $(function() {
     const $window = $(window);
     const $terminalElement = $('.messages');
     const $inputElement = $('.inputMessage');
+    const $tasksElement = $('.tasks');
     const socket = io();
+
+    let tasks = [];
+
+    const timer = setInterval(function() {
+        if (tasks.length === 0) {
+            $tasksElement[0].innerHTML = "<p>No tasks currently active.</p>"
+            $tasksElement[0].style.color = "#999"
+        } else {
+            let html = ""
+            let firstTask = true
+            tasks.forEach(task => {
+                task.timeLeft -= 1000
+
+                console.log("time left = " + task.timeLeft)
+                html += "<p>Task: " + task.name + "</p>"
+
+                let timeLeftReadable = ""
+                if (task.timeLeft > 0) {
+                    const days = Math.floor(task.timeLeft / (1000 * 60 * 60 * 24));
+                    const hours = Math.floor((task.timeLeft % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                    const minutes = Math.floor((task.timeLeft % (1000 * 60 * 60)) / (1000 * 60));
+                    const seconds = Math.floor((task.timeLeft % (1000 * 60)) / 1000) + 1;
+                    if (days > 0) {
+                        timeLeftReadable += days + "d "
+                    }
+                    if (hours > 0) {
+                        timeLeftReadable += hours + "h "
+                    }
+                    if (minutes > 0) {
+                        timeLeftReadable += minutes + "m "
+                    }
+                    if (seconds > 0) {
+                        timeLeftReadable += seconds + "s"
+                    }
+                } else {
+                    timeLeftReadable = "FINISHED"
+                }
+
+                html += "<p>Time left: " + timeLeftReadable + "</p>"
+
+                if (!firstTask) {
+                    html += "<br><br>"
+                }
+                firstTask = false
+            })
+            $tasksElement[0].innerHTML = html
+            $tasksElement[0].style.color = "#eee"
+        }
+    }, 1000)
 
     let connected = false;
 
@@ -75,7 +125,7 @@ $(function() {
 
     // - socket events
 
-    // whenever the server emits 'output', update the chat body
+    // server emits 'output', text to display to use
     socket.on('output', function (data) {
         connected = true;
         data.msg = "\n" + data.msg + "\n";
@@ -88,5 +138,12 @@ $(function() {
         }
 
         terminalOutput(data);
+    });
+
+    // server emits 'tasks', task timers to display
+    socket.on('tasks', function (data) {
+        connected = true;
+
+        tasks = data.tasks
     });
 });
