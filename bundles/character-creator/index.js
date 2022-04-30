@@ -321,7 +321,7 @@ module.exports = {
 			"description": "Clamps on arms. May manipulate close-by objects and materials.",
 			"status": "Operational",
 			"level": 1,
-			"upgradeable": false,
+			"upgradeable": true,
 			"max": 1,
 			"current": 0,
 			"valueTerm": "",
@@ -403,7 +403,7 @@ module.exports = {
 			"description": "Refines silicon (SIL) from raw materials (RAW).",
 			"status": "Operational",
 			"level": 1,
-			"upgradeable": false, // TODO : add upgrades later
+			"upgradeable": true,
 			"upgradeCost": [],
 			"max": 1,
 			"current": 0,

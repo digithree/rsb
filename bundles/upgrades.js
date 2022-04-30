@@ -147,6 +147,168 @@ module.exports = {
             ],
         },
         {
+            "name": "Arms",
+            "levels": [
+                {
+                    "level": 2,
+                    "costs": [
+                        {
+                            type: "NRG",
+                            amount: 30
+                        },
+                        {
+                            type: "MET",
+                            amount: 40
+                        },
+                        {
+                            type: "SIL",
+                            amount: 20
+                        }
+                    ],
+                    "duration": 30,
+                    "changes": {
+                        "status": "Operational",
+                        "yield": 30,
+                        "actions": [
+                            {
+                                "name": "harvest",
+                                "showCosts": true,
+                                "costs": [
+                                    {
+                                        "amount": 5,
+                                        "type": "NRG"
+                                    }
+                                ],
+                                "duration": 9,
+                                "output": [
+                                    {
+                                        "amount": 30,
+                                        "type": "RAW"
+                                    }
+                                ]
+                            },
+                            {
+                                "name": "fix",
+                                "showCosts": false,
+                                "costs": [],
+                                "duration": 0,
+                                "output": []
+                            },
+                            {
+                                "name": "upgrade",
+                                "showCosts": false,
+                                "costs": [],
+                                "duration": 0,
+                                "output": []
+                            }
+                        ],
+                    }
+                }
+            ],
+        },
+        {
+            "name": "Silicon refinery",
+            "levels": [
+                {
+                    "level": 2,
+                    "costs": [
+                        {
+                            type: "NRG",
+                            amount: 50
+                        },
+                        {
+                            type: "MET",
+                            amount: 20
+                        },
+                        {
+                            type: "SIL",
+                            amount: 30
+                        }
+                    ],
+                    "duration": 40,
+                    "changes": {
+                        "status": "Operational",
+                        "yield": 7,
+                        "energy": 8,
+                        "actions": [
+                            {
+                                "name": "refine-sil",
+                                "showCosts": true,
+                                "costs": [
+                                    {
+                                        "amount": 6,
+                                        "type": "NRG"
+                                    },
+                                    {
+                                        "amount": 10,
+                                        "type": "RAW"
+                                    }
+                                ],
+                                "duration": 20,
+                                "output": [
+                                    {
+                                        "amount": 7,
+                                        "type": "SIL"
+                                    }
+                                ]
+                            },
+                        ],
+                    }
+                }
+            ],
+        },
+        {
+            "name": "Metals refinery",
+            "levels": [
+                {
+                    "level": 2,
+                    "costs": [
+                        {
+                            type: "NRG",
+                            amount: 50
+                        },
+                        {
+                            type: "MET",
+                            amount: 20
+                        },
+                        {
+                            type: "SIL",
+                            amount: 30
+                        }
+                    ],
+                    "duration": 25,
+                    "changes": {
+                        "status": "Operational",
+                        "yield": 9,
+                        "energy": 7,
+                        "actions": [
+                            {
+                                "name": "refine-met",
+                                "showCosts": true,
+                                "costs": [
+                                    {
+                                        "amount": 7,
+                                        "type": "NRG"
+                                    },
+                                    {
+                                        "amount": 10,
+                                        "type": "RAW"
+                                    }
+                                ],
+                                "duration": 15,
+                                "output": [
+                                    {
+                                        "amount": 9,
+                                        "type": "MET"
+                                    }
+                                ]
+                            },
+                        ],
+                    }
+                }
+            ],
+        },
+        {
             "name": "Storage",
             "levels": [
                 {
