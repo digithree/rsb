@@ -57,6 +57,8 @@ body {
 }
 
 .tasks {
+  display: none;
+
   font-family: monospace;
   font-size: 14px;
 
@@ -73,5 +75,28 @@ body {
   padding: 10px;
   position: absolute;
   left: 0;
+  top: 0;
+}
+
+.info {
+  display: none;
+  flex-flow: column;
+
+  overflow-x: hidden;
+  overflow-y: auto;
+
+  font-family: monospace;
+  font-size: 14px;
+
+  border: 1px solid #777;
+  background-color: #181818;
+  color: #999;
+  outline: none;
+
+  width: 300px;
+  height: 100%;
+  padding: 10px;
+  position: absolute;
+  right: 0;
   top: 0;
 }

@@ -4,6 +4,7 @@ $(function() {
     const $terminalElement = $('.messages');
     const $inputElement = $('.inputMessage');
     const $tasksElement = $('.tasks');
+    const $infoElement = $('.info');
     const socket = io();
 
     let hasTasksUpdatePropagatedToSocket = false;
@@ -156,7 +157,16 @@ $(function() {
     // server emits 'tasks', task timers to display
     socket.on('tasks', function (data) {
         connected = true;
+        $tasksElement[0].style.display = "block"
         tasks = data.tasks
         hasTasksUpdatePropagatedToSocket = false
+    });
+
+    // server emits 'info', additional information, just as the tutorial
+    socket.on('info', function (data) {
+        connected = true;
+        $infoElement[0].style.display = "flex"
+        $infoElement[0].innerHTML += "<p>" + data.msg + "</p>"
+        $infoElement[0].scrollTop = $infoElement[0].scrollHeight
     });
 });
