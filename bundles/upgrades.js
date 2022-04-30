@@ -217,8 +217,21 @@ module.exports = {
                     "duration": 20,
                     "changes": {
                         "status": "Some panel damage",
-                        "yield": 18
-                        // TODO : update action "charge" output to match yield
+                        "yield": 18,
+                        "actions": [
+                            {
+                                "name": "charge",
+                                "showCosts": true,
+                                "costs": [],
+                                "duration": 5,
+                                "output": [
+                                    {
+                                        "type": "NRG",
+                                        "amount": 18
+                                    }
+                                ]
+                            }
+                        ],
                     }
                 },
                 {
@@ -239,8 +252,21 @@ module.exports = {
                     ],
                     "changes": {
                         "status": "Operational",
-                        // TODO : update action "charge" output to match yield
-                        "yield": 40
+                        "yield": 40,
+                        "actions": [
+                            {
+                                "name": "charge",
+                                "showCosts": true,
+                                "costs": [],
+                                "duration": 7,
+                                "output": [
+                                    {
+                                        "type": "NRG",
+                                        "amount": 40
+                                    }
+                                ]
+                            }
+                        ],
                     }
                 }
             ],

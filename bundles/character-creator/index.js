@@ -427,7 +427,7 @@ module.exports = {
 					"duration": 15,
 					"output": [
 						{
-							"amount": 2,
+							"amount": 3,
 							"type": "SIL"
 						}
 					]
